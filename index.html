@@ -1,0 +1,1725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vela — Coach Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  /* Vela brand palette */
+  --teal-deep:   #0F6E56;
+  --teal-mid:    #1D9E75;
+  --teal-light:  #5DCAA5;
+  --teal-glow:   rgba(29,158,117,0.10);
+  --teal-dim:    rgba(29,158,117,0.14);
+
+  /* Backgrounds — two tone charcoal */
+  --bg:          #1A1A1A;
+  --surface:     #141414;
+  --surface2:    #1A1A1A;
+  --surface3:    #202020;
+
+  /* Borders */
+  --border:      #262626;
+  --border2:     #2E2E2E;
+
+  /* Status */
+  --warn:        #E8A030;
+  --warn-dim:    rgba(232,160,48,0.11);
+  --danger:      #E05252;
+  --danger-dim:  rgba(224,82,82,0.10);
+  --blue:        #5B9CF6;
+  --blue-dim:    rgba(91,156,246,0.11);
+
+  /* Text — recalibrated for WCAG AA+ on dark bg */
+  --text:        #EAE8E4;  /* primary · 14:1 AAA */
+  --text2:       #A39E97;  /* secondary · 6.5:1 AAA */
+  --text3:       #807B75;  /* tertiary · 4.6:1 AA */
+  --text4:       #524E49;  /* decoration only · do not use for read text */
+
+  /* Type families */
+  --serif:       'Cormorant', Georgia, serif;
+  --mono:        'DM Mono', monospace;
+  --sans:        'DM Sans', sans-serif;
+
+  /* Type scale — modular 1.25 */
+  --fs-label:      10px;  /* eyebrow uppercase, scan only */
+  --fs-caption:    11px;  /* metadata, deltas, hints */
+  --fs-body-sm:    12px;  /* secondary read text */
+  --fs-body:       13px;  /* primary body */
+  --fs-display-sm: 22px;  /* screen titles, mid metrics */
+  --fs-display-lg: 30px;  /* hero metrics */
+
+  /* Letter-spacing tokens */
+  --ls-tight:      -0.3px;
+  --ls-loose:       0.5px;
+  --ls-eyebrow:     1.5px;
+}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  font-size:13px;
+  min-height:100vh;
+  line-height:1.5;
+  font-weight:400;
+  overflow-x:hidden;
+}
+
+/* ── LAYOUT ── */
+.shell{display:grid;grid-template-columns:216px 1fr;min-height:100vh}
+.main{min-width:0;overflow-x:hidden}
+.screen,.content,.panel,.panel-body{min-width:0}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  position:sticky;top:0;height:100vh;
+}
+
+/* ── VELA LOGO ── */
+.logo{
+  padding:22px 20px 18px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;
+}
+.logo-icon{flex-shrink:0}
+.logo-wordmark{
+  font-family:var(--serif);
+  font-size:26px;
+  font-weight:300;
+  color:var(--text);
+  letter-spacing:-0.5px;
+  line-height:1;
+}
+.logo-sub{
+  font-size:10px;color:var(--text3);
+  letter-spacing:var(--ls-eyebrow);text-transform:uppercase;
+  margin-top:3px;font-weight:500;
+}
+
+.nav{padding:16px 0;flex:1;overflow-y:auto}
+.nav-label{
+  font-size:9px;color:var(--text3);
+  letter-spacing:2.5px;text-transform:uppercase;
+  padding:10px 20px 5px;font-weight:400;
+}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 20px;font-size:12.5px;color:var(--text2);
+  cursor:pointer;border-left:2px solid transparent;
+  transition:all 0.15s;font-weight:400;
+}
+.nav-item:hover{color:var(--text);background:var(--surface2)}
+.nav-item.active{color:var(--teal-light);border-left-color:var(--teal-mid);background:var(--teal-glow)}
+.nav-dot{width:5px;height:5px;border-radius:50%;background:currentColor;opacity:0.45;flex-shrink:0}
+.nav-item.active .nav-dot{opacity:1}
+
+.sidebar-footer{
+  padding:16px 20px;
+  border-top:1px solid var(--border);
+}
+.coach-info{display:flex;align-items:center;gap:10px}
+.coach-avatar{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--teal-dim);border:1px solid var(--teal-deep);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:500;color:var(--teal-light);flex-shrink:0;
+}
+.coach-name{font-size:12px;font-weight:500;color:var(--text)}
+.coach-role{font-size:10px;color:var(--text3)}
+
+/* ── MAIN ── */
+.main{display:flex;flex-direction:column;min-height:100vh}
+
+/* ── TOPBAR ── */
+.topbar{
+  padding:14px 28px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--surface);
+  position:sticky;top:0;z-index:10;
+}
+.topbar-title{
+  font-family:var(--serif);
+  font-size:22px;font-weight:300;
+  color:var(--text);letter-spacing:-0.3px;
+  font-style:italic;
+}
+.topbar-date{font-size:11px;color:var(--text3);margin-top:2px;font-weight:400}
+.topbar-right{display:flex;align-items:center;gap:10px}
+
+.btn{
+  padding:6px 14px;border-radius:6px;border:1px solid var(--border2);
+  font-size:12px;font-weight:400;cursor:pointer;
+  background:var(--surface2);color:var(--text2);
+  transition:all 0.15s;font-family:var(--sans);
+}
+.btn:hover{color:var(--text);background:var(--surface3)}
+.btn-accent{
+  background:var(--teal-mid);color:var(--bg);
+  border-color:var(--teal-mid);font-weight:500;
+}
+.btn-accent:hover{background:var(--teal-deep);border-color:var(--teal-deep)}
+
+.alert-badge{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--danger);
+  animation:pulse 2.5s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.4)}}
+
+/* ── CONTENT ── */
+.content{padding:22px 28px;flex:1}
+
+/* ── SUMMARY STRIP ── */
+.summary-strip{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:10px;
+  margin-bottom:20px;
+}
+.stat-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:10px;padding:16px;
+  position:relative;overflow:hidden;
+}
+.stat-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1.5px;
+}
+.stat-card.green::before{background:var(--teal-mid)}
+.stat-card.warn::before{background:var(--warn)}
+.stat-card.danger::before{background:var(--danger)}
+.stat-card.blue::before{background:var(--blue)}
+.stat-label{font-size:9px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;font-weight:400}
+.stat-val{font-family:var(--serif);font-size:30px;font-weight:300;line-height:1;color:var(--text)}
+.stat-sub{font-size:12px;color:var(--text3);margin-top:7px;font-weight:400}
+.stat-sub b{font-weight:500}
+.stat-sub b.green{color:var(--teal-light)}
+.stat-sub b.warn{color:var(--warn)}
+.stat-sub b.danger{color:var(--danger)}
+
+/* ── GRID ── */
+.grid-2{display:grid;grid-template-columns:1fr minmax(320px,368px);gap:14px;margin-bottom:14px;min-width:0}
+
+/* ── PANEL ── */
+.panel{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;overflow:hidden;
+}
+.panel-header{
+  padding:13px 18px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.panel-title{font-size:11px;font-weight:500;color:var(--text2);letter-spacing:0.3px;text-transform:uppercase;letter-spacing:1px}
+.panel-action{font-size:11px;color:var(--text3);cursor:pointer;transition:color 0.15s;font-weight:400}
+.panel-action:hover{color:var(--teal-light)}
+.panel-body{padding:0}
+
+/* ── ROSTER TABLE ── */
+.roster-header{
+  font-size:9px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;
+  padding:8px 18px 6px;
+  display:grid;
+  grid-template-columns:20px minmax(120px,1fr) repeat(4,minmax(50px,80px)) minmax(72px,100px) 56px;
+  gap:0;
+  border-bottom:1px solid var(--border);
+}
+.roster-row{
+  display:grid;
+  grid-template-columns:20px minmax(120px,1fr) repeat(4,minmax(50px,80px)) minmax(72px,100px) 56px;
+  align-items:center;gap:0;
+  padding:10px 18px;
+  border-bottom:1px solid var(--border);
+  cursor:pointer;transition:background 0.12s;
+}
+.roster-row:last-child{border-bottom:none}
+.roster-row:hover{background:var(--surface2)}
+.roster-row.selected{background:var(--surface2);border-left:2px solid var(--teal-mid)}
+
+.risk-badge{
+  width:18px;height:18px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:8px;font-weight:600;flex-shrink:0;
+}
+.risk-badge.green{background:var(--teal-dim);color:var(--teal-light)}
+.risk-badge.warn{background:var(--warn-dim);color:var(--warn)}
+.risk-badge.danger{background:var(--danger-dim);color:var(--danger)}
+
+.athlete-name{font-size:12.5px;font-weight:500;color:var(--text);padding-left:8px}
+.athlete-event{font-size:11px;color:var(--text3);padding-left:8px;margin-top:1px;font-weight:400}
+
+.metric-cell{text-align:right}
+.metric-val{font-family:var(--mono);font-size:12px;color:var(--text);display:block}
+.metric-delta{font-size:10px;margin-top:1px;display:block}
+.metric-delta.up{color:var(--teal-light)}
+.metric-delta.down{color:var(--danger)}
+.metric-delta.flat{color:var(--text3)}
+
+.mini-bar{height:2px;border-radius:2px;background:var(--surface3);margin-top:4px;overflow:hidden}
+.mini-bar-fill{height:100%;border-radius:2px}
+
+.tag{
+  display:inline-flex;align-items:center;
+  padding:2px 8px;border-radius:4px;font-size:9.5px;font-weight:500;
+  letter-spacing:0.2px;
+}
+.tag.green{background:var(--teal-dim);color:var(--teal-light)}
+.tag.warn{background:var(--warn-dim);color:var(--warn)}
+.tag.danger{background:var(--danger-dim);color:var(--danger)}
+.tag.blue{background:var(--blue-dim);color:var(--blue)}
+.tag.muted{background:var(--surface3);color:var(--text3)}
+
+/* ── ALERT PANEL ── */
+.alert-item{
+  padding:12px 16px;border-bottom:1px solid var(--border);
+  display:flex;gap:12px;align-items:flex-start;
+  cursor:pointer;transition:background 0.12s;
+}
+.alert-item:hover{background:var(--surface2)}
+.alert-item:last-child{border-bottom:none}
+.alert-icon{
+  width:30px;height:30px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;flex-shrink:0;margin-top:1px;
+}
+.alert-icon.danger{background:var(--danger-dim)}
+.alert-icon.warn{background:var(--warn-dim)}
+.alert-icon.blue{background:var(--blue-dim)}
+.alert-name{font-size:12px;font-weight:500;color:var(--text);margin-bottom:2px}
+.alert-text{font-size:12px;color:var(--text2);line-height:1.5;font-weight:400}
+.alert-action{
+  margin-top:5px;display:inline-flex;align-items:center;gap:4px;
+  font-size:10.5px;color:var(--teal-light);font-weight:500;
+}
+.alert-time{font-size:11px;color:var(--text3);margin-left:auto;flex-shrink:0;padding-top:2px;font-weight:400}
+
+/* ── CHART ── */
+.chart-wrap{padding:14px 18px 30px;height:200px;position:relative}
+
+/* ── TIMELINE ── */
+.tl-header{
+  display:grid;grid-template-columns:88px repeat(7,1fr);
+  padding:7px 16px;border-bottom:1px solid var(--border);
+  font-size:9px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;
+  gap:4px;
+}
+.tl-row{
+  display:grid;grid-template-columns:88px repeat(7,1fr);
+  padding:7px 16px;border-bottom:1px solid var(--border);
+  gap:4px;align-items:center;
+}
+.tl-row:last-child{border-bottom:none}
+.tl-athlete{font-size:11px;color:var(--text2);font-weight:400}
+.tl-cell{
+  border-radius:3px;padding:3px 5px;font-size:9px;font-weight:500;
+  text-align:center;cursor:pointer;transition:opacity 0.12s;
+}
+.tl-cell:hover{opacity:0.75}
+.tl-cell.aerobic{background:var(--blue-dim);color:var(--blue)}
+.tl-cell.threshold{background:var(--warn-dim);color:var(--warn)}
+.tl-cell.vo2{background:rgba(180,100,240,0.11);color:#B46CF0}
+.tl-cell.recovery{background:var(--teal-dim);color:var(--teal-light)}
+.tl-cell.rest{background:var(--surface3);color:var(--text3)}
+.tl-cell.race{background:var(--danger-dim);color:var(--danger);font-weight:700}
+
+/* ── NUTRITION ── */
+.nutrition-row{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 16px;border-bottom:1px solid var(--border);
+}
+.nutrition-row:last-child{border-bottom:none}
+.nutrition-name{font-size:12px;font-weight:500;color:var(--text);width:90px;flex-shrink:0}
+.nutrition-bars{flex:1;display:flex;flex-direction:column;gap:3px}
+.nutrition-label{font-size:9px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;display:flex;justify-content:space-between}
+.nutrition-track{height:3px;background:var(--surface3);border-radius:2px;overflow:hidden}
+.nutrition-fill{height:100%;border-radius:2px}
+.nutrition-score{
+  width:34px;text-align:right;flex-shrink:0;
+  font-family:var(--mono);font-size:12px;color:var(--text2);
+}
+
+/* ── ATHLETE DETAIL ── */
+.detail-panel{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;overflow:hidden;margin-bottom:14px;
+}
+.detail-header{
+  padding:16px 18px;border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-start;justify-content:space-between;
+}
+.detail-name{font-family:var(--serif);font-size:24px;font-weight:300;color:var(--text);letter-spacing:-0.3px}
+.detail-meta{font-size:11px;color:var(--text3);margin-top:3px;font-weight:400}
+.detail-tags{display:flex;gap:6px;margin-top:8px}
+.detail-metrics{
+  display:grid;grid-template-columns:repeat(5,1fr);
+  border-bottom:1px solid var(--border);
+}
+.detail-metric{
+  padding:14px 16px;border-right:1px solid var(--border);
+  text-align:center;
+}
+.detail-metric:last-child{border-right:none}
+.dm-label{font-size:9px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;font-weight:400}
+.dm-val{font-family:var(--serif);font-size:24px;font-weight:300;color:var(--text);line-height:1}
+.dm-delta{font-size:11px;margin-top:3px;font-weight:400}
+.dm-delta.good{color:var(--teal-light)}
+.dm-delta.bad{color:var(--danger)}
+.dm-delta.neutral{color:var(--text3)}
+
+/* ── INSIGHT BOX ── */
+.insight-box{
+  margin:14px;padding:14px 16px;
+  background:rgba(29,158,117,0.06);
+  border:1px solid rgba(29,158,117,0.18);
+  border-radius:8px;
+}
+.insight-header{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.insight-label{font-size:10px;font-weight:500;color:var(--teal-light);letter-spacing:1.5px;text-transform:uppercase}
+.insight-text{font-size:13px;color:var(--text2);line-height:1.6;font-weight:400}
+.insight-action{
+  margin-top:16px;display:flex;flex-direction:column;align-items:flex-start;gap:10px;
+}
+.insight-btn{
+  cursor:pointer;border:none;font-family:var(--sans);transition:all 0.18s ease;
+}
+.insight-btn.primary{
+  padding:11px 20px;border-radius:7px;font-size:13px;font-weight:500;
+  background:var(--teal-mid);color:var(--bg);
+  box-shadow:0 1px 0 rgba(255,255,255,0.06) inset, 0 2px 10px rgba(29,158,117,0.28);
+  letter-spacing:0.1px;
+  display:inline-flex;align-items:center;gap:8px;
+}
+.insight-btn.primary:hover{
+  background:var(--teal-deep);
+  box-shadow:0 1px 0 rgba(255,255,255,0.08) inset, 0 4px 16px rgba(29,158,117,0.4);
+  transform:translateY(-1px);
+}
+.insight-btn.primary::after{content:'→';font-size:14px;line-height:1;opacity:0.85}
+/* Modal cancel buttons still need .insight-btn.secondary */
+.insight-btn.secondary{
+  padding:9px 16px;border-radius:6px;font-size:12.5px;font-weight:400;
+  background:transparent;color:var(--text2);border:1px solid var(--border2);
+}
+.insight-btn.secondary:hover{color:var(--text);border-color:var(--text3);background:var(--surface3)}
+.secondary-actions{
+  display:flex;align-items:center;gap:0;font-size:12px;color:var(--text3);
+  margin-left:-10px;
+}
+.secondary-actions .label{margin-right:12px;font-style:italic;color:var(--text3)}
+.action-link{
+  background:none;border:none;font-family:var(--sans);font-size:12.5px;
+  color:var(--text);cursor:pointer;padding:5px 10px;border-radius:5px;
+  transition:all 0.15s;font-weight:500;
+  position:relative;
+}
+.action-link:hover{
+  color:var(--teal-light);background:var(--teal-glow);
+}
+.action-link + .action-link{margin-left:2px}
+.action-sep{color:var(--text3);margin:0 6px;user-select:none;opacity:0.85}
+
+/* Inline scannable signals within prose — the eye picks these up first */
+.signal-hit{
+  font-family:var(--mono);font-variant-numeric:tabular-nums;
+  font-size:0.92em;font-weight:500;
+  padding:1px 5px;border-radius:3px;
+  white-space:nowrap;letter-spacing:-0.2px;
+}
+.signal-hit.bad{color:#F08585;background:rgba(224,82,82,0.10)}
+.signal-hit.warn{color:#F0B860;background:rgba(232,160,48,0.10)}
+.signal-hit.good{color:var(--teal-light);background:var(--teal-glow)}
+
+/* ===== Suggest Adjustment Modal ===== */
+.modal-backdrop{
+  position:fixed;inset:0;background:rgba(10,10,10,0.72);
+  backdrop-filter:blur(3px);z-index:1000;
+  display:none;align-items:center;justify-content:center;padding:40px 20px;
+}
+.modal-backdrop.open{display:flex}
+.modal{
+  background:var(--surface);border:1px solid var(--border2);border-radius:10px;
+  width:100%;max-width:640px;max-height:90vh;overflow-y:auto;
+  display:flex;flex-direction:column;
+}
+.modal-header{
+  padding:22px 26px 16px;border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-start;justify-content:space-between;gap:20px;
+}
+.modal-title{font-family:var(--serif);font-size:22px;font-weight:400;color:var(--text);letter-spacing:-0.2px;line-height:1.2}
+.modal-sub{font-size:11px;color:var(--text3);margin-top:4px;letter-spacing:0.5px;text-transform:uppercase}
+.modal-close{
+  background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;
+  width:28px;height:28px;display:flex;align-items:center;justify-content:center;
+  border-radius:4px;flex-shrink:0;
+}
+.modal-close:hover{color:var(--text);background:var(--surface3)}
+
+.modal-body{padding:20px 26px}
+
+.vela-proposed{
+  background:var(--teal-glow);border:1px solid var(--teal-deep);
+  border-radius:6px;padding:12px 14px;margin-bottom:20px;
+}
+.vela-proposed-label{font-size:9px;color:var(--teal-light);letter-spacing:2px;text-transform:uppercase;font-weight:500;margin-bottom:6px}
+.vela-proposed-text{font-size:13px;color:var(--text);line-height:1.5}
+
+.field-group{margin-bottom:18px}
+.field-label{display:block;font-size:11px;color:var(--text2);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;font-weight:500}
+.field-hint{font-size:11px;color:var(--text3);margin-top:6px;line-height:1.4;font-style:italic}
+.field-input,.field-textarea{
+  width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:6px;
+  padding:10px 12px;font-family:var(--sans);font-size:13px;color:var(--text);
+  resize:vertical;outline:none;transition:border-color 0.15s;
+}
+.field-input:focus,.field-textarea:focus{border-color:var(--teal-mid)}
+.field-textarea{min-height:70px;line-height:1.5}
+
+.reason-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.reason-chip{
+  font-size:11px;padding:5px 10px;border-radius:20px;
+  background:var(--surface3);border:1px solid var(--border2);color:var(--text2);
+  cursor:pointer;transition:all 0.15s;
+}
+.reason-chip:hover{color:var(--text);border-color:var(--text3)}
+.reason-chip.active{background:var(--teal-dim);border-color:var(--teal-deep);color:var(--teal-light)}
+
+.modal-footer{
+  padding:16px 26px;border-top:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+}
+.modal-footer .insight-btn.primary{padding:10px 18px;font-size:12.5px}
+.modal-footer .insight-btn.primary::after{content:none}
+.footer-note{font-size:10px;color:var(--text3);font-style:italic;max-width:320px;line-height:1.4}
+.footer-actions{display:flex;gap:8px}
+
+/* ===== Call Sheet (talking points) ===== */
+.talking-points{
+  background:var(--surface3);border:1px solid var(--border2);border-radius:6px;
+  padding:14px 16px;margin-bottom:18px;
+}
+.tp-header{font-size:9px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;font-weight:500}
+.tp-item{
+  display:flex;align-items:flex-start;gap:10px;padding:7px 0;
+  font-size:12.5px;color:var(--text);line-height:1.5;
+}
+.tp-item:not(:last-child){border-bottom:1px solid var(--border)}
+.tp-bullet{
+  color:var(--teal-light);font-family:var(--mono);font-size:10px;
+  margin-top:3px;flex-shrink:0;width:14px;
+}
+.tp-item strong{color:var(--text);font-weight:500}
+.tp-item span{color:var(--text2)}
+
+/* ===== Time slot picker ===== */
+.slot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.slot{
+  padding:10px 8px;text-align:center;border:1px solid var(--border2);
+  border-radius:5px;background:var(--surface3);cursor:pointer;transition:all 0.15s;
+}
+.slot:hover{border-color:var(--text3);color:var(--text)}
+.slot.active{background:var(--teal-dim);border-color:var(--teal-deep);color:var(--teal-light)}
+.slot-day{font-size:9px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.slot.active .slot-day{color:var(--teal-light);opacity:0.7}
+.slot-time{font-size:12px;color:var(--text2);font-family:var(--mono)}
+.slot.active .slot-time{color:var(--teal-light)}
+
+/* ===== Override severity radios ===== */
+.severity-stack{display:flex;flex-direction:column;gap:8px}
+.severity-opt{
+  display:flex;align-items:flex-start;gap:12px;padding:12px 14px;
+  border:1px solid var(--border2);border-radius:6px;background:var(--surface3);
+  cursor:pointer;transition:all 0.15s;
+}
+.severity-opt:hover{border-color:var(--text3)}
+.severity-opt.active{background:var(--teal-glow);border-color:var(--teal-deep)}
+.severity-radio{
+  width:14px;height:14px;border-radius:50%;border:1.5px solid var(--text3);
+  margin-top:2px;flex-shrink:0;position:relative;
+}
+.severity-opt.active .severity-radio{border-color:var(--teal-mid)}
+.severity-opt.active .severity-radio::after{
+  content:'';position:absolute;inset:2px;border-radius:50%;background:var(--teal-mid);
+}
+.severity-text{flex:1}
+.severity-title{font-size:13px;color:var(--text);font-weight:500;margin-bottom:2px}
+.severity-desc{font-size:11px;color:var(--text3);line-height:1.4}
+
+/* ===== Alert Detail Modal ===== */
+.alert-item{cursor:pointer}
+
+.alert-pill{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:3px 10px;border-radius:20px;font-size:10px;
+  letter-spacing:1.5px;text-transform:uppercase;font-weight:500;
+  margin-top:6px;
+}
+.alert-pill.danger{background:var(--danger-dim);color:var(--danger)}
+.alert-pill.warn{background:var(--warn-dim);color:var(--warn)}
+.alert-pill.blue{background:var(--blue-dim);color:var(--blue)}
+
+.signal-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px;
+}
+.signal-card{
+  background:var(--surface3);border:1px solid var(--border2);border-radius:6px;
+  padding:12px 14px;
+}
+.signal-label{font-size:9px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;font-weight:500}
+.signal-value{font-family:var(--serif);font-size:22px;font-weight:300;color:var(--text);line-height:1}
+.signal-delta{font-size:10.5px;margin-top:4px;font-weight:400}
+.signal-delta.bad{color:var(--danger)}
+.signal-delta.warn{color:var(--warn)}
+.signal-delta.good{color:var(--teal-light)}
+.signal-delta.neutral{color:var(--text3)}
+
+.pattern-box{
+  border-left:2px solid var(--teal-mid);padding:0 0 0 14px;margin-bottom:18px;
+}
+.pattern-label{font-size:9px;color:var(--teal-light);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;font-weight:500}
+.pattern-text{font-size:13px;color:var(--text);line-height:1.55}
+.pattern-text strong{font-weight:500}
+
+.recommended-action{
+  background:var(--teal-glow);border:1px solid var(--teal-deep);border-radius:6px;
+  padding:14px 16px;margin-bottom:6px;
+}
+.ra-label{font-size:9px;color:var(--teal-light);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;font-weight:500}
+.ra-text{font-size:13px;color:var(--text);line-height:1.5}
+.ra-text strong{font-weight:500}
+
+/* ===== Screen system ===== */
+.screen{display:none}
+.screen.active{display:block}
+
+/* ===== Roster screen ===== */
+.roster-toolbar{
+  display:flex;align-items:center;gap:10px;padding:14px 28px;
+  border-bottom:1px solid var(--border);background:var(--surface);
+}
+.roster-search{
+  flex:1;max-width:340px;position:relative;
+}
+.roster-search input{
+  width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:6px;
+  padding:8px 12px 8px 32px;font-family:var(--sans);font-size:12.5px;color:var(--text);
+  outline:none;transition:border-color 0.15s;
+}
+.roster-search input:focus{border-color:var(--teal-mid)}
+.roster-search input::placeholder{color:var(--text3)}
+.roster-search::before{
+  content:'⌕';position:absolute;left:11px;top:50%;transform:translateY(-50%);
+  color:var(--text3);font-size:14px;
+}
+.filter-pills{display:flex;gap:6px}
+.filter-pill{
+  padding:6px 12px;font-size:11px;border-radius:6px;
+  background:var(--surface3);border:1px solid var(--border2);color:var(--text2);
+  cursor:pointer;transition:all 0.15s;
+}
+.filter-pill:hover{color:var(--text)}
+.filter-pill.active{background:var(--teal-dim);border-color:var(--teal-deep);color:var(--teal-light)}
+.filter-pill .count{
+  display:inline-block;margin-left:6px;padding:1px 6px;border-radius:10px;
+  background:rgba(255,255,255,0.06);font-size:10px;font-family:var(--mono);
+}
+.toolbar-spacer{flex:1}
+
+.roster-summary{
+  padding:18px 28px;border-bottom:1px solid var(--border);
+  display:flex;align-items:baseline;gap:24px;
+}
+.rs-item{display:flex;align-items:baseline;gap:8px}
+.rs-num{font-family:var(--serif);font-size:24px;font-weight:300;color:var(--text);line-height:1}
+.rs-num.danger{color:var(--danger)}
+.rs-num.warn{color:var(--warn)}
+.rs-num.good{color:var(--teal-light)}
+.rs-num.blue{color:var(--blue)}
+.rs-label{font-size:10px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase}
+
+/* Roster table */
+.roster-table{padding:0 28px 28px}
+.rt-header{
+  display:grid;grid-template-columns:32px minmax(180px,1fr) repeat(4,minmax(72px,90px)) minmax(96px,110px) 56px;
+  gap:10px;padding:12px 14px;font-size:9px;color:var(--text3);
+  letter-spacing:1.5px;text-transform:uppercase;font-weight:500;
+  border-bottom:1px solid var(--border2);
+}
+.rt-row{
+  display:grid;grid-template-columns:32px minmax(180px,1fr) repeat(4,minmax(72px,90px)) minmax(96px,110px) 56px;
+  gap:10px;padding:14px;align-items:center;
+  border-bottom:1px solid var(--border);cursor:pointer;
+  transition:background 0.15s;
+}
+.rt-row:hover{background:var(--surface2)}
+.rt-rank{
+  font-family:var(--mono);font-size:11px;color:var(--text3);
+}
+.rt-athlete{display:flex;align-items:center;gap:10px}
+.rt-avatar{
+  width:30px;height:30px;border-radius:50%;
+  background:var(--teal-dim);border:1px solid var(--teal-deep);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;color:var(--teal-light);font-weight:500;flex-shrink:0;
+}
+.rt-name{font-size:12.5px;color:var(--text);font-weight:500;line-height:1.2}
+.rt-meta{font-size:10px;color:var(--text3);margin-top:2px}
+.rt-metric{
+  font-family:var(--mono);font-size:12px;color:var(--text2);
+}
+.rt-metric .delta{font-size:10px;display:block;margin-top:2px;font-family:var(--sans)}
+.rt-metric .delta.bad{color:var(--danger)}
+.rt-metric .delta.warn{color:var(--warn)}
+.rt-metric .delta.good{color:var(--teal-light)}
+.rt-metric .delta.neutral{color:var(--text3)}
+.rt-status{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:4px 10px;border-radius:12px;font-size:10px;
+  letter-spacing:0.5px;text-transform:uppercase;font-weight:500;
+}
+.rt-status.danger{background:var(--danger-dim);color:var(--danger)}
+.rt-status.warn{background:var(--warn-dim);color:var(--warn)}
+.rt-status.good{background:var(--teal-dim);color:var(--teal-light)}
+.rt-status.blue{background:var(--blue-dim);color:var(--blue)}
+.rt-action{
+  font-size:11px;color:var(--text3);text-align:right;font-family:var(--mono);
+}
+.rt-row:hover .rt-action{color:var(--teal-light)}
+
+/* ── VELA ICON SVG ── */
+.vela-icon svg{display:block}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+.panel,.stat-card,.detail-panel{animation:fadeIn 0.25s ease both}
+.stat-card:nth-child(1){animation-delay:0s}
+.stat-card:nth-child(2){animation-delay:0.04s}
+.stat-card:nth-child(3){animation-delay:0.08s}
+.stat-card:nth-child(4){animation-delay:0.12s}
+
+/* Tabular nums for all numeric/mono content — column alignment */
+.metric-val, .stat-val, .signal-value, .rs-num, .dm-val, .nutrition-score,
+.slot-time, .filter-pill .count, .tp-bullet, .rt-rank, .rt-action,
+.rt-metric, .severity-radio, .stat-sub b, .signal-delta {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-icon vela-icon">
+      <svg width="34" height="42" viewBox="0 0 56 70" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4,62 C6,40 12,18 16,4 C20,18 22,40 20,62 Z" fill="#0F6E56"/>
+        <path d="M16,4 C20,20 28,42 24,62 L20,62 C22,40 20,18 16,4 Z" fill="#1D9E75"/>
+        <path d="M26,62 C28,44 32,24 36,12 C40,24 38,46 34,62 Z" fill="#5DCAA5"/>
+        <line x1="4" y1="66" x2="38" y2="66" stroke="#5DCAA5" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-wordmark">Vela</div>
+      <div class="logo-sub">Coach Dashboard</div>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <div class="nav-label">Overview</div>
+    <div class="nav-item active" id="navBrief" onclick="showScreen('brief')"><div class="nav-dot"></div>Monday Brief</div>
+    <div class="nav-item" id="navRoster" onclick="showScreen('roster')"><div class="nav-dot"></div>Roster</div>
+    <div class="nav-item"><div class="nav-dot"></div>Alerts</div>
+    <div class="nav-label" style="margin-top:8px">Analytics</div>
+    <div class="nav-item"><div class="nav-dot"></div>Load & HRV</div>
+    <div class="nav-item"><div class="nav-dot"></div>Nutrition</div>
+    <div class="nav-item"><div class="nav-dot"></div>Timeline</div>
+    <div class="nav-label" style="margin-top:8px">Settings</div>
+    <div class="nav-item"><div class="nav-dot"></div>Integrations</div>
+    <div class="nav-item"><div class="nav-dot"></div>Preferences</div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="coach-info">
+      <div class="coach-avatar">GP</div>
+      <div>
+        <div class="coach-name">Guilherme Pereira</div>
+        <div class="coach-role">28 athletes · Pro plan</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+<!-- ============ SCREEN: BRIEF ============ -->
+<div class="screen active" id="screenBrief">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">Monday Brief</div>
+      <div class="topbar-date">Monday, April 6, 2026 · Week 14 of 52</div>
+    </div>
+    <div class="topbar-right">
+      <div class="alert-badge"></div>
+      <button class="btn">← Last week</button>
+      <button class="btn-accent btn">Generate new brief</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- SUMMARY STRIP -->
+    <div class="summary-strip">
+      <div class="stat-card green">
+        <div class="stat-label">On track</div>
+        <div class="stat-val">19</div>
+        <div class="stat-sub"><b class="green">68%</b> of roster performing within plan</div>
+      </div>
+      <div class="stat-card warn">
+        <div class="stat-label">Watch closely</div>
+        <div class="stat-val">6</div>
+        <div class="stat-sub">Elevated load or <b class="warn">declining HRV trend</b></div>
+      </div>
+      <div class="stat-card danger">
+        <div class="stat-label">Act today</div>
+        <div class="stat-val">3</div>
+        <div class="stat-sub"><b class="danger">Intervention needed</b> — do not add load</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-label">Time saved</div>
+        <div class="stat-val">4<span style="font-size:15px;font-weight:300">min</span></div>
+        <div class="stat-sub">vs <b>3h 40min</b> manual last Monday</div>
+      </div>
+    </div>
+
+    <!-- ATHLETE DETAIL -->
+    <div class="detail-panel">
+      <div class="detail-header">
+        <div>
+          <div class="detail-name">Marcus Delgado</div>
+          <div class="detail-meta">Triathlete · Target: IRONMAN 70.3 Florianópolis · Jun 14</div>
+          <div class="detail-tags">
+            <span class="tag danger">⚠ Act today</span>
+            <span class="tag muted">Week 8 of 18</span>
+            <span class="tag muted">Build phase</span>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;font-weight:400">Last sync</div>
+          <div style="font-family:var(--mono);font-size:12px;color:var(--text2)">Today 06:42</div>
+        </div>
+      </div>
+
+      <div class="detail-metrics">
+        <div class="detail-metric">
+          <div class="dm-label">HRV (7d avg)</div>
+          <div class="dm-val" style="color:var(--danger)">48</div>
+          <div class="dm-delta bad">↓ 22% vs baseline</div>
+        </div>
+        <div class="detail-metric">
+          <div class="dm-label">TSS this week</div>
+          <div class="dm-val">487</div>
+          <div class="dm-delta bad">↑ 31% over plan</div>
+        </div>
+        <div class="detail-metric">
+          <div class="dm-label">Sleep avg</div>
+          <div class="dm-val">5.8<span style="font-size:13px">h</span></div>
+          <div class="dm-delta bad">↓ 1.4h vs usual</div>
+        </div>
+        <div class="detail-metric">
+          <div class="dm-label">Nutrition</div>
+          <div class="dm-val">3/5</div>
+          <div class="dm-delta neutral">meals confirmed</div>
+        </div>
+        <div class="detail-metric">
+          <div class="dm-label">Resting HR</div>
+          <div class="dm-val">58</div>
+          <div class="dm-delta bad">↑ 8 bpm elevated</div>
+        </div>
+      </div>
+
+      <div class="insight-box">
+        <div class="insight-header">
+          <span style="font-size:13px">⚡</span>
+          <span class="insight-label">Vela Insight</span>
+        </div>
+        <div class="insight-text">
+          Marcus shows converging fatigue signals this week: HRV <span class="signal-hit bad">↓22%</span> below his 9-day baseline, TSS <span class="signal-hit bad">+31%</span> above plan, and sleep averaging <span class="signal-hit bad">5.8h</span> — consistent with high stress load outside training. Missing <span class="signal-hit warn">2 of 5</span> nutrition check-ins compounds recovery risk.
+          <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+            <span style="color:var(--text3);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:500;display:block;margin-bottom:8px">⚡ Recommendation</span>
+            <span style="color:var(--text);font-weight:500">Full rest today</span> <span style="color:var(--text2)">+</span> <span style="color:var(--text);font-weight:500">load reduction of <span class="signal-hit good">−40%</span> through Thursday.</span> <span style="color:var(--text2)">Do not add any intensity this week.</span>
+          </div>
+        </div>
+        <div class="insight-action">
+          <button class="insight-btn primary">Apply suggested adjustment</button>
+          <div class="secondary-actions">
+            <button class="action-link" onclick="document.getElementById('suggestModal').classList.add('open')">Suggest your own</button>
+            <span class="action-sep">·</span>
+            <button class="action-link" onclick="document.getElementById('callModal').classList.add('open')">Schedule a call</button>
+            <span class="action-sep">·</span>
+            <button class="action-link" onclick="document.getElementById('overrideModal').classList.add('open')">Dismiss</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border)">
+        <div style="border-right:1px solid var(--border)">
+          <div style="padding:14px 20px 0;display:flex;justify-content:space-between;align-items:baseline">
+            <div style="font-size:10px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;font-weight:500">HRV trend · 14 days</div>
+            <div style="font-size:10px;color:var(--text3);font-family:var(--mono)">ms</div>
+          </div>
+          <div class="chart-wrap" id="hrvChart"></div>
+        </div>
+
+        <div>
+          <div style="padding:14px 20px 0;display:flex;justify-content:space-between;align-items:baseline">
+            <div style="font-size:10px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;font-weight:500">Load vs plan · 6 weeks</div>
+            <div style="font-size:10px;color:var(--text3);font-family:var(--mono)">TSS</div>
+          </div>
+          <div class="chart-wrap" id="loadChart"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROSTER + ALERTS -->
+    <div class="grid-2">
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Full roster — risk ranking</div>
+          <div class="panel-action" onclick="showScreen('roster')" style="cursor:pointer">View all 29 →</div>
+        </div>
+        <div class="panel-body">
+          <div class="roster-header">
+            <span></span>
+            <span>Athlete</span>
+            <span style="text-align:right">HRV</span>
+            <span style="text-align:right">TSS</span>
+            <span style="text-align:right">Sleep</span>
+            <span style="text-align:right">Nutrition</span>
+            <span style="text-align:right">Status</span>
+            <span style="text-align:right">Action</span>
+          </div>
+
+          <div class="roster-row selected">
+            <div class="risk-badge danger">!</div>
+            <div><div class="athlete-name">Marcus Delgado</div><div class="athlete-event">70.3 Floripa · Jun 14</div></div>
+            <div class="metric-cell"><span class="metric-val" style="color:var(--danger)">48ms</span><span class="metric-delta down">↓22%</span></div>
+            <div class="metric-cell"><span class="metric-val">487</span><span class="metric-delta down">+31%</span></div>
+            <div class="metric-cell"><span class="metric-val" style="color:var(--danger)">5.8h</span><span class="metric-delta down">↓1.4h</span></div>
+            <div class="metric-cell"><span class="metric-val">3/5</span><span class="metric-delta flat">—</span></div>
+            <div class="metric-cell"><span class="tag danger">Act today</span></div>
+            <div class="metric-cell"><span style="font-size:11px;color:var(--teal-light);cursor:pointer">Adjust →</span></div>
+          </div>
+
+          <div class="roster-row">
+            <div class="risk-badge danger">!</div>
+            <div><div class="athlete-name">Sofia Andrade</div><div class="athlete-event">IRONMAN Brasil · Oct 5</div></div>
+            <div class="metric-cell"><span class="metric-val" style="color:var(--danger)">51ms</span><span class="metric-delta down">↓18%</span></div>
+            <div class="metric-cell"><span class="metric-val">520</span><span class="metric-delta down">+28%</span></div>
+            <div class="metric-cell"><span class="metric-val">6.1h</span><span class="metric-delta down">↓1.1h</span></div>
+            <div class="metric-cell"><span class="metric-val">4/5</span><span class="metric-delta flat">—</span></div>
+            <div class="metric-cell"><span class="tag danger">Act today</span></div>
+            <div class="metric-cell"><span style="font-size:11px;color:var(--teal-light);cursor:pointer">Adjust →</span></div>
+          </div>
+
+          <div class="roster-row">
+            <div class="risk-badge danger">!</div>
+            <div><div class="athlete-name">Rafael Lima</div><div class="athlete-event">70.3 Maceió · Aug 3</div></div>
+            <div class="metric-cell"><span class="metric-val" style="color:var(--warn)">56ms</span><span class="metric-delta down">↓14%</span></div>
+            <div class="metric-cell"><span class="metric-val">445</span><span class="metric-delta down">+22%</span></div>
+            <div class="metric-cell"><span class="metric-val" style="color:var(--warn)">6.4h</span><span class="metric-delta down">↓0.8h</span></div>
+            <div class="metric-cell"><span class="metric-val">2/5</span><span class="metric-delta down">low</span></div>
+            <div class="metric-cell"><span class="tag danger">Act today</span></div>
+            <div class="metric-cell"><span style="font-size:11px;color:var(--teal-light);cursor:pointer">Adjust →</span></div>
+          </div>
+
+          <div class="roster-row">
+            <div class="risk-badge warn">~</div>
+            <div><div class="athlete-name">Camila Torres</div><div class="athlete-event">70.3 Floripa · Jun 14</div></div>
+            <div class="metric-cell"><span class="metric-val" style="color:var(--warn)">62ms</span><span class="metric-delta down">↓9%</span></div>
+            <div class="metric-cell"><span class="metric-val">390</span><span class="metric-delta down">+12%</span></div>
+            <div class="metric-cell"><span class="metric-val">7.0h</span><span class="metric-delta flat">—</span></div>
+            <div class="metric-cell"><span class="metric-val">5/5</span><span class="metric-delta up">✓</span></div>
+            <div class="metric-cell"><span class="tag warn">Watch</span></div>
+            <div class="metric-cell"><span style="font-size:11px;color:var(--text3);cursor:pointer">Review</span></div>
+          </div>
+
+          <div class="roster-row">
+            <div class="risk-badge warn">~</div>
+            <div><div class="athlete-name">Diego Mendes</div><div class="athlete-event">IRONMAN Brasil · Oct 5</div></div>
+            <div class="metric-cell"><span class="metric-val" style="color:var(--warn)">65ms</span><span class="metric-delta down">↓7%</span></div>
+            <div class="metric-cell"><span class="metric-val">360</span><span class="metric-delta down">+8%</span></div>
+            <div class="metric-cell"><span class="metric-val">7.2h</span><span class="metric-delta flat">—</span></div>
+            <div class="metric-cell"><span class="metric-val">4/5</span><span class="metric-delta flat">—</span></div>
+            <div class="metric-cell"><span class="tag warn">Watch</span></div>
+            <div class="metric-cell"><span style="font-size:11px;color:var(--text3);cursor:pointer">Review</span></div>
+          </div>
+
+          <div class="roster-row">
+            <div class="risk-badge green">✓</div>
+            <div><div class="athlete-name">Milena Prado</div><div class="athlete-event">Olympic · build · improving</div></div>
+            <div class="metric-cell"><span class="metric-val" style="color:var(--teal-light)">71ms</span><span class="metric-delta up">+5%</span></div>
+            <div class="metric-cell"><span class="metric-val">320</span><span class="metric-delta flat">on plan</span></div>
+            <div class="metric-cell"><span class="metric-val" style="color:var(--teal-light)">7.8h</span><span class="metric-delta up">+0.4h</span></div>
+            <div class="metric-cell"><span class="metric-val">5/5</span><span class="metric-delta up">✓</span></div>
+            <div class="metric-cell"><span class="tag green">Ready ↑</span></div>
+            <div class="metric-cell"><span style="font-size:11px;color:var(--text3);cursor:pointer">View</span></div>
+          </div>
+
+          <div class="roster-row">
+            <div class="risk-badge green">✓</div>
+            <div><div class="athlete-name">Iara Saraiva</div><div class="athlete-event">70.3 · base · improving</div></div>
+            <div class="metric-cell"><span class="metric-val" style="color:var(--teal-light)">68ms</span><span class="metric-delta up">+4%</span></div>
+            <div class="metric-cell"><span class="metric-val">305</span><span class="metric-delta flat">on plan</span></div>
+            <div class="metric-cell"><span class="metric-val" style="color:var(--teal-light)">7.6h</span><span class="metric-delta up">+0.3h</span></div>
+            <div class="metric-cell"><span class="metric-val">5/5</span><span class="metric-delta up">✓</span></div>
+            <div class="metric-cell"><span class="tag green">Ready ↑</span></div>
+            <div class="metric-cell"><span style="font-size:11px;color:var(--text3);cursor:pointer">View</span></div>
+          </div>
+
+          <div class="roster-row">
+            <div class="risk-badge green">✓</div>
+            <div><div class="athlete-name">Pedro Santana</div><div class="athlete-event">IRONMAN AZ · Nov 17</div></div>
+            <div class="metric-cell"><span class="metric-val" style="color:var(--teal-light)">82ms</span><span class="metric-delta up">+6%</span></div>
+            <div class="metric-cell"><span class="metric-val">290</span><span class="metric-delta flat">on plan</span></div>
+            <div class="metric-cell"><span class="metric-val">8.1h</span><span class="metric-delta up">+0.6h</span></div>
+            <div class="metric-cell"><span class="metric-val">5/5</span><span class="metric-delta up">✓</span></div>
+            <div class="metric-cell"><span class="tag green">On track</span></div>
+            <div class="metric-cell"><span style="font-size:11px;color:var(--text3);cursor:pointer">View</span></div>
+          </div>
+
+          <div style="padding:10px 18px;font-size:11px;color:var(--text3);border-top:1px solid var(--border);font-weight:400">
+            + 21 more athletes · <span style="color:var(--teal-light);cursor:pointer">19 on track · 3 watch · 0 critical</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ALERTS + NUTRITION -->
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Smart alerts</div>
+            <div class="panel-action">Mark all read</div>
+          </div>
+          <div class="panel-body">
+            <div class="alert-item" onclick="openAlert('marcus')">
+              <div class="alert-icon danger">⚠</div>
+              <div style="flex:1">
+                <div class="alert-name">Marcus Delgado</div>
+                <div class="alert-text">HRV down 22% over 9 days. TSS exceeded plan by 31%. Sleep deficit detected. Convergent fatigue signals.</div>
+                <div class="alert-action">→ Apply full rest protocol</div>
+              </div>
+              <div class="alert-time">now</div>
+            </div>
+            <div class="alert-item" onclick="openAlert('sofia')">
+              <div class="alert-icon danger">⚠</div>
+              <div style="flex:1">
+                <div class="alert-name">Sofia Andrade</div>
+                <div class="alert-text">Resting HR elevated 11 bpm above 30-day baseline. TSS 28% above plan. Reduce load immediately.</div>
+                <div class="alert-action">→ Suggest recovery week</div>
+              </div>
+              <div class="alert-time">2h</div>
+            </div>
+            <div class="alert-item" onclick="openAlert('camila')">
+              <div class="alert-icon warn">↗</div>
+              <div style="flex:1">
+                <div class="alert-name">Camila Torres</div>
+                <div class="alert-text">Load 12% above plan for 2nd consecutive week. HRV stable but trending down. Watch closely.</div>
+                <div class="alert-action">→ Review this week's plan</div>
+              </div>
+              <div class="alert-time">4h</div>
+            </div>
+            <div class="alert-item" onclick="openAlert('ana')">
+              <div class="alert-icon blue">↑</div>
+              <div style="flex:1">
+                <div class="alert-name">Ana Beatriz Costa</div>
+                <div class="alert-text">HRV up 4% over 2 weeks. Sleep quality improving. Ready for load progression next block.</div>
+                <div class="alert-action">→ Increase volume 10%</div>
+              </div>
+              <div class="alert-time">6h</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Nutrition adherence · this week</div>
+            <div class="panel-action">Send reminders</div>
+          </div>
+          <div class="panel-body">
+            <div class="nutrition-row">
+              <div class="nutrition-name">Marcus D.</div>
+              <div class="nutrition-bars">
+                <div class="nutrition-label"><span>Meals confirmed</span><span style="color:var(--warn)">3/5</span></div>
+                <div class="nutrition-track"><div class="nutrition-fill" style="width:60%;background:var(--warn)"></div></div>
+              </div>
+              <div class="nutrition-score" style="color:var(--warn)">60%</div>
+            </div>
+            <div class="nutrition-row">
+              <div class="nutrition-name">Sofia A.</div>
+              <div class="nutrition-bars">
+                <div class="nutrition-label"><span>Meals confirmed</span><span style="color:var(--teal-light)">4/5</span></div>
+                <div class="nutrition-track"><div class="nutrition-fill" style="width:80%;background:var(--teal-mid)"></div></div>
+              </div>
+              <div class="nutrition-score">80%</div>
+            </div>
+            <div class="nutrition-row">
+              <div class="nutrition-name">Rafael L.</div>
+              <div class="nutrition-bars">
+                <div class="nutrition-label"><span>Meals confirmed</span><span style="color:var(--danger)">2/5</span></div>
+                <div class="nutrition-track"><div class="nutrition-fill" style="width:40%;background:var(--danger)"></div></div>
+              </div>
+              <div class="nutrition-score" style="color:var(--danger)">40%</div>
+            </div>
+            <div class="nutrition-row">
+              <div class="nutrition-name">Ana B.</div>
+              <div class="nutrition-bars">
+                <div class="nutrition-label"><span>Meals confirmed</span><span style="color:var(--teal-light)">5/5</span></div>
+                <div class="nutrition-track"><div class="nutrition-fill" style="width:100%;background:var(--teal-mid)"></div></div>
+              </div>
+              <div class="nutrition-score">100%</div>
+            </div>
+            <div class="nutrition-row">
+              <div class="nutrition-name">Pedro S.</div>
+              <div class="nutrition-bars">
+                <div class="nutrition-label"><span>Meals confirmed</span><span style="color:var(--teal-light)">5/5</span></div>
+                <div class="nutrition-track"><div class="nutrition-fill" style="width:100%;background:var(--teal-mid)"></div></div>
+              </div>
+              <div class="nutrition-score">100%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WEEKLY TIMELINE -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Weekly training timeline · top athletes</div>
+        <div class="panel-action">Expand all →</div>
+      </div>
+      <div class="panel-body">
+        <div class="tl-header">
+          <span>Athlete</span>
+          <span style="text-align:center">Mon</span>
+          <span style="text-align:center">Tue</span>
+          <span style="text-align:center">Wed</span>
+          <span style="text-align:center">Thu</span>
+          <span style="text-align:center">Fri</span>
+          <span style="text-align:center">Sat</span>
+          <span style="text-align:center">Sun</span>
+        </div>
+        <div class="tl-row">
+          <div class="tl-athlete">Marcus D.</div>
+          <div class="tl-cell rest">REST ←</div>
+          <div class="tl-cell recovery">Recovery</div>
+          <div class="tl-cell recovery">Recovery</div>
+          <div class="tl-cell aerobic">Z2 Ride</div>
+          <div class="tl-cell rest">Rest</div>
+          <div class="tl-cell aerobic">Long Run</div>
+          <div class="tl-cell rest">Rest</div>
+        </div>
+        <div class="tl-row">
+          <div class="tl-athlete">Sofia A.</div>
+          <div class="tl-cell rest">REST ←</div>
+          <div class="tl-cell aerobic">Z2 Swim</div>
+          <div class="tl-cell recovery">Recovery</div>
+          <div class="tl-cell aerobic">Z2 Bike</div>
+          <div class="tl-cell rest">Rest</div>
+          <div class="tl-cell aerobic">Long Ride</div>
+          <div class="tl-cell rest">Rest</div>
+        </div>
+        <div class="tl-row">
+          <div class="tl-athlete">Camila T.</div>
+          <div class="tl-cell aerobic">Z2 Run</div>
+          <div class="tl-cell threshold">Threshold</div>
+          <div class="tl-cell aerobic">Z2 Swim</div>
+          <div class="tl-cell vo2">VO2max</div>
+          <div class="tl-cell rest">Rest</div>
+          <div class="tl-cell aerobic">Brick</div>
+          <div class="tl-cell recovery">Recovery</div>
+        </div>
+        <div class="tl-row">
+          <div class="tl-athlete">Ana B.</div>
+          <div class="tl-cell threshold">Threshold</div>
+          <div class="tl-cell aerobic">Z2 Bike</div>
+          <div class="tl-cell aerobic">Z2 Run</div>
+          <div class="tl-cell vo2">VO2max</div>
+          <div class="tl-cell rest">Rest</div>
+          <div class="tl-cell race">Race sim</div>
+          <div class="tl-cell recovery">Recovery</div>
+        </div>
+        <div class="tl-row">
+          <div class="tl-athlete">Pedro S.</div>
+          <div class="tl-cell aerobic">Z2 Swim</div>
+          <div class="tl-cell threshold">Threshold</div>
+          <div class="tl-cell aerobic">Z2 Run</div>
+          <div class="tl-cell aerobic">Z2 Bike</div>
+          <div class="tl-cell rest">Rest</div>
+          <div class="tl-cell aerobic">Long Ride</div>
+          <div class="tl-cell recovery">Recovery</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /screenBrief -->
+
+<!-- ============ SCREEN: ROSTER ============ -->
+<div class="screen" id="screenRoster">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">Roster</div>
+      <div class="topbar-date">29 active athletes · sorted by risk</div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn">Export CSV</button>
+      <button class="btn-accent btn">+ Add athlete</button>
+    </div>
+  </div>
+
+  <div class="roster-summary">
+    <div class="rs-item"><span class="rs-num">29</span><span class="rs-label">Total</span></div>
+    <div class="rs-item"><span class="rs-num danger">3</span><span class="rs-label">High risk</span></div>
+    <div class="rs-item"><span class="rs-num warn">5</span><span class="rs-label">Watch</span></div>
+    <div class="rs-item"><span class="rs-num good">19</span><span class="rs-label">On track</span></div>
+    <div class="rs-item"><span class="rs-num blue">2</span><span class="rs-label">Ready to progress</span></div>
+  </div>
+
+  <div class="roster-toolbar">
+    <div class="roster-search"><input type="text" placeholder="Search athletes..."></div>
+    <div class="filter-pills">
+      <span class="filter-pill active" onclick="document.querySelectorAll('.filter-pill').forEach(p=>p.classList.remove('active'));this.classList.add('active')">All <span class="count">29</span></span>
+      <span class="filter-pill" onclick="document.querySelectorAll('.filter-pill').forEach(p=>p.classList.remove('active'));this.classList.add('active')">High risk <span class="count">3</span></span>
+      <span class="filter-pill" onclick="document.querySelectorAll('.filter-pill').forEach(p=>p.classList.remove('active'));this.classList.add('active')">Watch <span class="count">5</span></span>
+      <span class="filter-pill" onclick="document.querySelectorAll('.filter-pill').forEach(p=>p.classList.remove('active'));this.classList.add('active')">On track <span class="count">19</span></span>
+      <span class="filter-pill" onclick="document.querySelectorAll('.filter-pill').forEach(p=>p.classList.remove('active'));this.classList.add('active')">Progress <span class="count">2</span></span>
+    </div>
+    <div class="toolbar-spacer"></div>
+    <button class="btn">Bulk message</button>
+  </div>
+
+  <div class="roster-table">
+    <div class="rt-header">
+      <div>#</div>
+      <div>Athlete</div>
+      <div>HRV (7d)</div>
+      <div>TSS vs plan</div>
+      <div>Sleep avg</div>
+      <div>RHR</div>
+      <div>Status</div>
+      <div></div>
+    </div>
+
+    <div id="rosterTableBody"></div>
+  </div>
+</div><!-- /screenRoster -->
+
+</main>
+</div>
+
+<script>
+// ============ CHART RENDERER (pixel-perfect, resize-aware) ============
+
+function renderHrvChart() {
+  const c = document.getElementById('hrvChart'); if (!c) return;
+  const W = c.clientWidth, H = c.clientHeight;
+  const padL = 18, padR = 18, padT = 14, padB = 30;
+  const innerW = W - padL - padR, innerH = H - padT - padB;
+  const data = [72,71,74,69,65,62,58,55,52,50,49,50,48,48];
+  const yMin = 40, yMax = 80;
+  const baselineLow = 70, baselineHigh = 74, baseline = 72;
+
+  const x = i => padL + (i / (data.length - 1)) * innerW;
+  const y = v => padT + (1 - (v - yMin) / (yMax - yMin)) * innerH;
+
+  const linePath = data.map((v, i) => `${i === 0 ? 'M' : 'L'} ${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+  const areaPath = `${linePath} L ${x(data.length - 1).toFixed(1)},${(padT + innerH).toFixed(1)} L ${x(0).toFixed(1)},${(padT + innerH).toFixed(1)} Z`;
+
+  const endX = x(data.length - 1), endY = y(data[data.length - 1]);
+  const bandY1 = y(baselineHigh), bandY2 = y(baselineLow), baselineY = y(baseline);
+
+  c.innerHTML = `
+    <svg width="${W}" height="${H}" style="display:block">
+      <defs>
+        <linearGradient id="hrvGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#E05252" stop-opacity="0.32"/>
+          <stop offset="100%" stop-color="#E05252" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <rect x="${padL}" y="${bandY1}" width="${innerW}" height="${bandY2 - bandY1}" fill="#1D9E75" fill-opacity="0.07"/>
+      <line x1="${padL}" y1="${baselineY}" x2="${padL + innerW}" y2="${baselineY}" stroke="#1D9E75" stroke-opacity="0.45" stroke-width="1" stroke-dasharray="4 4"/>
+      <text x="${padL + innerW - 4}" y="${baselineY - 5}" font-family="DM Mono,monospace" font-size="9" fill="#5DCAA5" fill-opacity="0.7" text-anchor="end">baseline ${baseline}</text>
+      <path d="${areaPath}" fill="url(#hrvGrad)"/>
+      <path d="${linePath}" fill="none" stroke="#E05252" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+      <circle cx="${endX}" cy="${endY}" r="11" fill="#E05252" fill-opacity="0.16"/>
+      <circle cx="${endX}" cy="${endY}" r="4" fill="#E05252" stroke="#1A1A1A" stroke-width="2"/>
+    </svg>
+    <div style="position:absolute;left:${(endX - 92).toFixed(0)}px;top:${(endY - 48).toFixed(0)}px;text-align:right;width:80px;pointer-events:none;line-height:1">
+      <div style="font-family:var(--mono);font-size:24px;color:#F08585;font-weight:500;letter-spacing:-1px;font-variant-numeric:tabular-nums">48</div>
+      <div style="font-size:10px;color:#F08585;margin-top:4px;font-family:var(--sans);font-weight:500">↓22% today</div>
+    </div>
+    <div style="position:absolute;bottom:8px;left:${padL}px;right:${padR}px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--text3);pointer-events:none">
+      <span>Mar 24</span><span style="opacity:0.5">Mar 31</span><span>Apr 6</span>
+    </div>
+  `;
+}
+
+function renderLoadChart() {
+  const c = document.getElementById('loadChart'); if (!c) return;
+  const W = c.clientWidth, H = c.clientHeight;
+  const padL = 22, padR = 22, padT = 28, padB = 24;
+  const innerW = W - padL - padR, innerH = H - padT - padB;
+  const actual = [310, 335, 380, 420, 460, 487];
+  const planned = [320, 340, 360, 370, 380, 372];
+  const yMax = 510;
+  const labels = ['W9', 'W10', 'W11', 'W12', 'W13', 'W14'];
+
+  const slotW = innerW / actual.length;
+  const barW = Math.min(slotW * 0.55, 38);
+  const baseY = padT + innerH;
+  const y = v => baseY - (v / yMax) * innerH;
+
+  const colorFor = (a, p) => {
+    const ratio = a / p;
+    if (ratio <= 1.05) return '#1D9E75';
+    if (ratio <= 1.15) return '#E8A030';
+    return '#E05252';
+  };
+
+  const bars = actual.map((a, i) => {
+    const cx = padL + slotW * (i + 0.5);
+    const x0 = cx - barW / 2;
+    const yA = y(a), yP = y(planned[i]);
+    const color = colorFor(a, planned[i]);
+    const isCurrent = i === actual.length - 1;
+    const overH = Math.max(0, yP - yA);
+    return `
+      <rect x="${x0}" y="${yA}" width="${barW}" height="${baseY - yA}" rx="3"
+            fill="${color}" fill-opacity="${isCurrent ? 0.28 : 0.20}"
+            ${isCurrent ? `stroke="${color}" stroke-opacity="0.55" stroke-width="1"` : ''}/>
+      ${overH > 1 ? `<rect x="${x0}" y="${yA}" width="${barW}" height="${overH}" rx="3"
+            fill="${color}" fill-opacity="${isCurrent ? 0.78 : 0.55}"/>` : ''}
+      <line x1="${cx - barW / 2 - 5}" y1="${yP}" x2="${cx + barW / 2 + 5}" y2="${yP}"
+            stroke="#5DCAA5" stroke-opacity="${isCurrent ? 1 : 0.7}" stroke-width="1.5" stroke-dasharray="3 2"/>
+    `;
+  }).join('');
+
+  const lastIdx = actual.length - 1;
+  const endCx = padL + slotW * (lastIdx + 0.5);
+  const endY = y(actual[lastIdx]);
+
+  // Annotation centered above bar W14, never escapes container top
+  const annW = 70;
+  const annLeft = Math.max(4, Math.min(W - annW - 4, endCx - annW / 2));
+  const annTop = Math.max(2, endY - 44);
+
+  c.innerHTML = `
+    <svg width="${W}" height="${H}" style="display:block">
+      ${bars}
+      <line x1="0" y1="${baseY}" x2="${W}" y2="${baseY}" stroke="#262626" stroke-width="1"/>
+    </svg>
+    <div style="position:absolute;left:${annLeft.toFixed(0)}px;top:${annTop.toFixed(0)}px;width:${annW}px;text-align:center;pointer-events:none;line-height:1">
+      <div style="font-family:var(--mono);font-size:18px;color:#F08585;font-weight:500;letter-spacing:-0.5px;font-variant-numeric:tabular-nums">487</div>
+      <div style="font-size:10px;color:#F08585;margin-top:3px;font-family:var(--sans);font-weight:500">+31% over plan</div>
+    </div>
+    <div style="position:absolute;bottom:8px;left:${padL}px;right:${padR}px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--text3);pointer-events:none">
+      ${labels.map((l, i) => `<span${i === lastIdx ? ' style="color:var(--text2);font-weight:500"' : ''}>${l}</span>`).join('')}
+    </div>
+  `;
+}
+
+function renderAllCharts() { renderHrvChart(); renderLoadChart(); }
+renderAllCharts();
+let chartResizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(chartResizeTimer);
+  chartResizeTimer = setTimeout(renderAllCharts, 100);
+});
+
+// ============ ROSTER (data-driven) ============
+
+const ROSTER = [
+  // status: danger | warn | good | blue
+  { name:'Marcus Delgado',     init:'MD', meta:'70.3 · 6 weeks out',          hrv:[48,'↓ 22%','bad'], tss:['+31%','over plan','bad'],   sleep:['5.8h','↓ 1.4h','bad'],   rhr:[58,'↑ 8','bad'],   status:['danger','⚠ High risk'] },
+  { name:'Sofia Andrade',      init:'SA', meta:'Olympic · base phase',        hrv:[52,'↓ 14%','bad'], tss:['+28%','over plan','bad'],   sleep:['6.7h','stable','neutral'], rhr:[64,'↑ 11','bad'],   status:['danger','⚠ High risk'] },
+  { name:'Rafael Pinheiro',    init:'RP', meta:'Marathon · 4 weeks out',      hrv:[44,'↓ 18%','bad'], tss:['+19%','over plan','warn'],  sleep:['6.1h','↓ 0.9h','warn'],  rhr:[61,'↑ 6','bad'],    status:['danger','⚠ High risk'] },
+  { name:'Camila Torres',      init:'CT', meta:'Half marathon · build',       hrv:[61,'↓ 3%','warn'], tss:['+12%','over plan','warn'],  sleep:['7.1h','stable','neutral'], rhr:[54,'in range','good'], status:['warn','↗ Watch'] },
+  { name:'Lucas Fernandes',    init:'LF', meta:'70.3 · base phase',           hrv:[58,'↓ 5%','warn'], tss:['+8%','on plan','neutral'],  sleep:['6.8h','↓ 0.4h','warn'],  rhr:[52,'in range','good'], status:['warn','↗ Watch'] },
+  { name:'Juliana Ribeiro',    init:'JR', meta:'Olympic · peak',              hrv:[66,'stable','neutral'], tss:['+14%','over plan','warn'], sleep:['7.0h','stable','neutral'], rhr:[50,'in range','good'], status:['warn','↗ Watch'] },
+  { name:'Diego Moraes',       init:'DM', meta:'Marathon · taper',            hrv:[59,'↓ 4%','warn'], tss:['-12%','under plan','neutral'], sleep:['7.2h','stable','neutral'], rhr:[55,'stable','neutral'], status:['warn','↗ Watch'] },
+  { name:'Patricia Bianchi',   init:'PB', meta:'Ironman · build',             hrv:[62,'↓ 6%','warn'], tss:['+9%','on plan','neutral'],  sleep:['6.6h','↓ 0.5h','warn'],  rhr:[53,'in range','good'], status:['warn','↗ Watch'] },
+  { name:'Thiago Souza',       init:'TS', meta:'70.3 · build',                hrv:[64,'stable','good'], tss:['+2%','on plan','neutral'], sleep:['7.4h','stable','good'], rhr:[51,'in range','good'], status:['good','✓ On track'] },
+  { name:'Fernanda Alves',     init:'FA', meta:'Half marathon · base',        hrv:[71,'↑ 2%','good'], tss:['100%','on plan','good'],    sleep:['7.6h','stable','good'],  rhr:[48,'in range','good'], status:['good','✓ On track'] },
+  { name:'Bruno Vasconcelos',  init:'BV', meta:'Olympic · base',              hrv:[65,'stable','good'], tss:['-3%','on plan','neutral'], sleep:['7.3h','stable','good'], rhr:[52,'in range','good'], status:['good','✓ On track'] },
+  { name:'Mariana Oliveira',   init:'MO', meta:'70.3 · taper',                hrv:[69,'stable','good'], tss:['-18%','tapering','neutral'], sleep:['7.8h','↑ 0.3h','good'], rhr:[49,'in range','good'], status:['good','✓ On track'] },
+  { name:'Ricardo Castro',     init:'RC', meta:'Marathon · build',            hrv:[63,'stable','good'], tss:['+4%','on plan','neutral'], sleep:['7.1h','stable','good'], rhr:[54,'in range','good'], status:['good','✓ On track'] },
+  { name:'Larissa Mendonça',   init:'LM', meta:'Half marathon · build',       hrv:[68,'stable','good'], tss:['100%','on plan','good'],    sleep:['7.5h','stable','good'],  rhr:[50,'in range','good'], status:['good','✓ On track'] },
+  { name:'Gustavo Carvalho',   init:'GC', meta:'Ironman · base',              hrv:[60,'stable','good'], tss:['-2%','on plan','neutral'], sleep:['7.0h','stable','good'], rhr:[53,'in range','good'], status:['good','✓ On track'] },
+  { name:'Isabela Santos',     init:'IS', meta:'70.3 · base',                 hrv:[67,'stable','good'], tss:['+1%','on plan','good'],    sleep:['7.4h','stable','good'],  rhr:[51,'in range','good'], status:['good','✓ On track'] },
+  { name:'Eduardo Nunes',      init:'EN', meta:'Marathon · base',             hrv:[62,'stable','good'], tss:['-5%','on plan','neutral'], sleep:['7.2h','stable','good'], rhr:[52,'in range','good'], status:['good','✓ On track'] },
+  { name:'Raquel Almeida',     init:'RA', meta:'Half marathon · base',        hrv:[70,'↑ 1%','good'], tss:['100%','on plan','good'],    sleep:['7.6h','stable','good'],  rhr:[49,'in range','good'], status:['good','✓ On track'] },
+  { name:'Felipe Pereira',     init:'FP', meta:'Olympic · build',             hrv:[64,'stable','good'], tss:['+3%','on plan','neutral'], sleep:['7.3h','stable','good'], rhr:[53,'in range','good'], status:['good','✓ On track'] },
+  { name:'Carolina Lima',      init:'CL', meta:'70.3 · build',                hrv:[66,'stable','good'], tss:['100%','on plan','good'],    sleep:['7.5h','stable','good'],  rhr:[50,'in range','good'], status:['good','✓ On track'] },
+  { name:'Vinicius Rocha',     init:'VR', meta:'Marathon · base',             hrv:[61,'stable','good'], tss:['-4%','on plan','neutral'], sleep:['7.1h','stable','good'], rhr:[54,'in range','good'], status:['good','✓ On track'] },
+  { name:'Natalia Borges',     init:'NB', meta:'Half marathon · taper',       hrv:[68,'stable','good'], tss:['-22%','tapering','neutral'], sleep:['7.7h','↑ 0.2h','good'], rhr:[48,'in range','good'], status:['good','✓ On track'] },
+  { name:'Henrique Martins',   init:'HM', meta:'Ironman · build',             hrv:[59,'stable','good'], tss:['+5%','on plan','neutral'], sleep:['7.0h','stable','good'], rhr:[55,'in range','good'], status:['good','✓ On track'] },
+  { name:'Daniela Gomes',      init:'DG', meta:'70.3 · base',                 hrv:[65,'stable','good'], tss:['+2%','on plan','neutral'], sleep:['7.4h','stable','good'], rhr:[51,'in range','good'], status:['good','✓ On track'] },
+  { name:'Pedro Araújo',       init:'PA', meta:'Marathon · build',            hrv:[63,'stable','good'], tss:['100%','on plan','good'],    sleep:['7.2h','stable','good'], rhr:[52,'in range','good'], status:['good','✓ On track'] },
+  { name:'Silvia Coelho',      init:'SC', meta:'Half marathon · base',        hrv:[69,'stable','good'], tss:['-1%','on plan','good'],    sleep:['7.5h','stable','good'],  rhr:[50,'in range','good'], status:['good','✓ On track'] },
+  { name:'André Prado',        init:'AP', meta:'Olympic · base',              hrv:[61,'stable','good'], tss:['+4%','on plan','neutral'], sleep:['7.1h','stable','good'], rhr:[53,'in range','good'], status:['good','✓ On track'] },
+  { name:'Iara Saraiva',       init:'IS', meta:'70.3 · base · improving',     hrv:[68,'↑ 4%','good'], tss:['98%','on plan','good'],     sleep:['7.6h','↑ 0.3h','good'],  rhr:[49,'↓ 2','good'],   status:['blue','↑ Progress'] },
+  { name:'Milena Prado',       init:'MP', meta:'Olympic · build · improving', hrv:[71,'↑ 5%','good'], tss:['100%','on plan','good'],    sleep:['7.8h','↑ 0.4h','good'],  rhr:[47,'↓ 3','good'],   status:['blue','↑ Progress'] },
+];
+
+function renderRoster() {
+  const tbody = document.getElementById('rosterTableBody'); if (!tbody) return;
+  const cell = ([val, delta, cls]) => `<div class="rt-metric">${val}<span class="delta ${cls}">${delta}</span></div>`;
+  tbody.innerHTML = ROSTER.map((r, i) => `
+    <div class="rt-row">
+      <div class="rt-rank">${String(i + 1).padStart(2, '0')}</div>
+      <div class="rt-athlete">
+        <div class="rt-avatar">${r.init}</div>
+        <div><div class="rt-name">${r.name}</div><div class="rt-meta">${r.meta}</div></div>
+      </div>
+      ${cell(r.hrv)}${cell(r.tss)}${cell(r.sleep)}${cell(r.rhr)}
+      <div><span class="rt-status ${r.status[0]}">${r.status[1]}</span></div>
+      <div class="rt-action">→</div>
+    </div>
+  `).join('');
+}
+renderRoster();
+
+// Row selection
+document.querySelectorAll('.roster-row').forEach(row => {
+  row.addEventListener('click', function() {
+    document.querySelectorAll('.roster-row').forEach(r => r.classList.remove('selected'));
+    this.classList.add('selected');
+  });
+});
+</script>
+<!-- ===== Suggest Adjustment Modal ===== -->
+<div class="modal-backdrop" id="suggestModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Suggest an adjustment</div>
+        <div class="modal-sub">Marcus Chen · Week of Apr 13</div>
+      </div>
+      <button class="modal-close" onclick="document.getElementById('suggestModal').classList.remove('open')">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="vela-proposed">
+        <div class="vela-proposed-label">⚡ Vela recommended</div>
+        <div class="vela-proposed-text">Full rest today + <span class="signal-hit bad">−40% load</span> through Thursday. No intensity this week.</div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Your adjustment</label>
+        <textarea class="field-textarea" placeholder="e.g. Rest today only, 20% reduction through Wednesday, add easy Z2 ride Friday."></textarea>
+        <div class="field-hint">Describe what you'd prescribe instead — in your own words.</div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Why do you disagree?</label>
+        <div class="reason-chips">
+          <span class="reason-chip" onclick="this.classList.toggle('active')">Known athlete pattern</span>
+          <span class="reason-chip" onclick="this.classList.toggle('active')">Context Vela doesn't know</span>
+          <span class="reason-chip" onclick="this.classList.toggle('active')">Race phase priority</span>
+          <span class="reason-chip" onclick="this.classList.toggle('active')">HRV reading unreliable</span>
+          <span class="reason-chip" onclick="this.classList.toggle('active')">Too conservative</span>
+          <span class="reason-chip" onclick="this.classList.toggle('active')">Too aggressive</span>
+        </div>
+        <textarea class="field-textarea" placeholder="Marcus always shows low HRV in work-heavy weeks — it's not real fatigue. He responds better to reduced volume than full rest."></textarea>
+        <div class="field-hint">This is what makes Vela smarter. Your reasoning trains the model to recognize your coaching style over time.</div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <div class="footer-note">Vela learns from every override. After ~8 weeks of signals, recommendations start mirroring your style.</div>
+      <div class="footer-actions">
+        <button class="insight-btn secondary" onclick="document.getElementById('suggestModal').classList.remove('open')">Cancel</button>
+        <button class="insight-btn primary">Apply my adjustment</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Schedule Call Modal ===== -->
+<div class="modal-backdrop" id="callModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Schedule a check-in</div>
+        <div class="modal-sub">Marcus Chen · Vela prepared a call sheet</div>
+      </div>
+      <button class="modal-close" onclick="document.getElementById('callModal').classList.remove('open')">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="talking-points">
+        <div class="tp-header">⚡ Suggested talking points</div>
+        <div class="tp-item">
+          <span class="tp-bullet">01</span>
+          <div><strong>Open with sleep.</strong> <span>Averaging <span class="signal-hit bad">5.8h</span> this week vs. his <span class="signal-hit good">7.2h</span> baseline. Ask what's changed at home or work.</span></div>
+        </div>
+        <div class="tp-item">
+          <span class="tp-bullet">02</span>
+          <div><strong>Probe stress, not training.</strong> <span>HRV pattern matches life-stress signature, not overtraining. Don't lead with workout pushback.</span></div>
+        </div>
+        <div class="tp-item">
+          <span class="tp-bullet">03</span>
+          <div><strong>Nutrition gaps.</strong> <span>Missed <span class="signal-hit warn">2 of 5</span> check-ins. Likely correlated with whatever else is going on.</span></div>
+        </div>
+        <div class="tp-item">
+          <span class="tp-bullet">04</span>
+          <div><strong>Frame the deload as protection.</strong> <span>He's <span class="signal-hit warn">6 weeks out</span> from his 70.3 — recovery now buys peak fitness later.</span></div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Pick a time</label>
+        <div class="slot-grid">
+          <div class="slot active" onclick="document.querySelectorAll('#callModal .slot').forEach(s=>s.classList.remove('active'));this.classList.add('active')">
+            <div class="slot-day">Tue Apr 14</div><div class="slot-time">7:30 AM</div>
+          </div>
+          <div class="slot" onclick="document.querySelectorAll('#callModal .slot').forEach(s=>s.classList.remove('active'));this.classList.add('active')">
+            <div class="slot-day">Tue Apr 14</div><div class="slot-time">12:00 PM</div>
+          </div>
+          <div class="slot" onclick="document.querySelectorAll('#callModal .slot').forEach(s=>s.classList.remove('active'));this.classList.add('active')">
+            <div class="slot-day">Tue Apr 14</div><div class="slot-time">6:00 PM</div>
+          </div>
+          <div class="slot" onclick="document.querySelectorAll('#callModal .slot').forEach(s=>s.classList.remove('active'));this.classList.add('active')">
+            <div class="slot-day">Wed Apr 15</div><div class="slot-time">7:30 AM</div>
+          </div>
+          <div class="slot" onclick="document.querySelectorAll('#callModal .slot').forEach(s=>s.classList.remove('active'));this.classList.add('active')">
+            <div class="slot-day">Wed Apr 15</div><div class="slot-time">12:00 PM</div>
+          </div>
+          <div class="slot" onclick="document.querySelectorAll('#callModal .slot').forEach(s=>s.classList.remove('active'));this.classList.add('active')">
+            <div class="slot-day">Wed Apr 15</div><div class="slot-time">6:00 PM</div>
+          </div>
+        </div>
+        <div class="field-hint">Synced from your Google Calendar · 30 min default</div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Note for Marcus (optional)</label>
+        <textarea class="field-textarea" placeholder="Hey Marcus — quick check-in to chat about how the week's been going. Nothing to worry about."></textarea>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <div class="footer-note">Vela will send the invite and tag this week's brief as "discussed" once the call happens.</div>
+      <div class="footer-actions">
+        <button class="insight-btn secondary" onclick="document.getElementById('callModal').classList.remove('open')">Cancel</button>
+        <button class="insight-btn primary">Send invite</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Override Modal ===== -->
+<div class="modal-backdrop" id="overrideModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Dismiss this insight</div>
+        <div class="modal-sub">Marcus Chen · Week of Apr 13</div>
+      </div>
+      <button class="modal-close" onclick="document.getElementById('overrideModal').classList.remove('open')">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="vela-proposed">
+        <div class="vela-proposed-label">⚡ Vela flagged</div>
+        <div class="vela-proposed-text">High risk · HRV down, TSS up, sleep deficit, nutrition gaps</div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Why dismiss?</label>
+        <div class="severity-stack">
+          <div class="severity-opt active" onclick="document.querySelectorAll('#overrideModal .severity-opt').forEach(o=>o.classList.remove('active'));this.classList.add('active')">
+            <div class="severity-radio"></div>
+            <div class="severity-text">
+              <div class="severity-title">I've already handled this</div>
+              <div class="severity-desc">Talked to athlete, adjusted plan offline, or it's already resolved.</div>
+            </div>
+          </div>
+          <div class="severity-opt" onclick="document.querySelectorAll('#overrideModal .severity-opt').forEach(o=>o.classList.remove('active'));this.classList.add('active')">
+            <div class="severity-radio"></div>
+            <div class="severity-text">
+              <div class="severity-title">Not actually a concern</div>
+              <div class="severity-desc">Vela is reading the data wrong for this athlete. Won't change my plan.</div>
+            </div>
+          </div>
+          <div class="severity-opt" onclick="document.querySelectorAll('#overrideModal .severity-opt').forEach(o=>o.classList.remove('active'));this.classList.add('active')">
+            <div class="severity-radio"></div>
+            <div class="severity-text">
+              <div class="severity-title">Wrong signal entirely</div>
+              <div class="severity-desc">Vela missed the real issue or flagged something irrelevant. Tell me more below.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Quick note <span style="color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+        <textarea class="field-textarea" placeholder="Optional context — helps Vela learn faster."></textarea>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <div class="footer-note">Dismissed insights stay in this week's history. You can revisit them anytime.</div>
+      <div class="footer-actions">
+        <button class="insight-btn secondary" onclick="document.getElementById('overrideModal').classList.remove('open')">Cancel</button>
+        <button class="insight-btn primary">Dismiss</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Alert Detail Modal ===== -->
+<div class="modal-backdrop" id="alertModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="alertName">—</div>
+        <div class="alert-pill" id="alertPill">—</div>
+      </div>
+      <button class="modal-close" onclick="document.getElementById('alertModal').classList.remove('open')">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="signal-grid" id="alertSignals"></div>
+
+      <div class="pattern-box">
+        <div class="pattern-label">⚡ Pattern detected</div>
+        <div class="pattern-text" id="alertPattern">—</div>
+      </div>
+
+      <div class="recommended-action">
+        <div class="ra-label" id="alertRaLabel">Recommended action</div>
+        <div class="ra-text" id="alertRaText">—</div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <div class="footer-note" id="alertFooterNote">Detected from TrainingPeaks + Garmin sync · 6 min ago</div>
+      <div class="footer-actions" id="alertActions"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen'+name.charAt(0).toUpperCase()+name.slice(1)).classList.add('active');
+  document.querySelectorAll('#navBrief, #navRoster').forEach(n=>n.classList.remove('active'));
+  const navMap={brief:'navBrief',roster:'navRoster'};
+  if(navMap[name])document.getElementById(navMap[name]).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+const ALERT_DATA = {
+  marcus: {
+    name: 'Marcus Delgado',
+    pillClass: 'danger',
+    pillText: '⚠ High risk · convergent signals',
+    signals: [
+      {label:'HRV (9-day avg)', value:'48 ms', delta:'↓ 22% vs baseline', deltaClass:'bad'},
+      {label:'TSS this week', value:'612', delta:'↑ 31% above plan', deltaClass:'bad'},
+      {label:'Sleep avg', value:'5.8 h', delta:'↓ 1.4h vs baseline', deltaClass:'bad'},
+      {label:'Resting HR', value:'58 bpm', delta:'↑ 8 bpm elevated', deltaClass:'bad'}
+    ],
+    pattern: 'Four independent metrics moving in the wrong direction simultaneously. This is not a single bad day — it\'s a <strong>systemic recovery failure</strong>. Pattern matches stress overload more than overtraining: low HRV + poor sleep + missed nutrition check-ins suggest something happening outside training.',
+    raLabel: '⚡ Recommended protocol',
+    raText: '<strong>Full rest today + <span class="signal-hit bad">−40% load</span> through Thursday.</strong> No intensity this week. Re-evaluate <span class="signal-hit warn">Friday</span> with HRV trend.',
+    actions: '<button class="insight-btn secondary" onclick="document.getElementById(\'alertModal\').classList.remove(\'open\')">Dismiss</button><button class="insight-btn secondary" onclick="document.getElementById(\'alertModal\').classList.remove(\'open\');document.getElementById(\'callModal\').classList.add(\'open\')">Schedule call</button><button class="insight-btn primary">Apply protocol</button>',
+    footer: 'Detected from TrainingPeaks + Garmin · synced 6 min ago'
+  },
+  sofia: {
+    name: 'Sofia Andrade',
+    pillClass: 'danger',
+    pillText: '⚠ High risk · cardiovascular strain',
+    signals: [
+      {label:'Resting HR', value:'64 bpm', delta:'↑ 11 bpm above baseline', deltaClass:'bad'},
+      {label:'TSS this week', value:'548', delta:'↑ 28% above plan', deltaClass:'bad'},
+      {label:'HRV trend', value:'52 ms', delta:'↓ 14% over 7 days', deltaClass:'bad'},
+      {label:'Sleep avg', value:'6.7 h', delta:'stable', deltaClass:'neutral'}
+    ],
+    pattern: 'Sleep is holding, which rules out lifestyle stress. The combination of <strong>elevated resting HR + suppressed HRV + over-plan TSS</strong> points to classic accumulated training fatigue. Sofia is absorbing more load than the plan accounts for.',
+    raLabel: '⚡ Recommended protocol',
+    raText: '<strong>Insert recovery week now.</strong> Drop volume <span class="signal-hit bad">−50%</span>, all Z1-Z2, no quality work. Resume progression once resting HR returns within <span class="signal-hit warn">4 bpm</span> of baseline.',
+    actions: '<button class="insight-btn secondary" onclick="document.getElementById(\'alertModal\').classList.remove(\'open\')">Dismiss</button><button class="insight-btn secondary" onclick="document.getElementById(\'alertModal\').classList.remove(\'open\');document.getElementById(\'callModal\').classList.add(\'open\')">Schedule call</button><button class="insight-btn primary">Apply recovery week</button>',
+    footer: 'Detected from Garmin sync · 2 hours ago'
+  },
+  camila: {
+    name: 'Camila Torres',
+    pillClass: 'warn',
+    pillText: '↗ Watch · early drift',
+    signals: [
+      {label:'Load vs plan', value:'+12%', delta:'2 weeks consecutive', deltaClass:'warn'},
+      {label:'HRV (7-day)', value:'61 ms', delta:'↓ 3% trending', deltaClass:'warn'},
+      {label:'Sleep avg', value:'7.1 h', delta:'stable', deltaClass:'neutral'},
+      {label:'Resting HR', value:'54 bpm', delta:'within range', deltaClass:'good'}
+    ],
+    pattern: 'No red flags yet — but the <strong>shape is concerning</strong>. Camila is consistently exceeding plan by a margin that compounds. HRV softening hints her body is starting to register the extra load. Acting now prevents what happened to Sofia three weeks ago.',
+    raLabel: '⚡ Suggested action',
+    raText: '<strong>Have a conversation this week.</strong> Either she\'s adding sessions intentionally (re-scope plan upward) or unintentionally (dial back). Either way, get aligned <span class="signal-hit warn">before HRV breaks</span>.',
+    actions: '<button class="insight-btn secondary" onclick="document.getElementById(\'alertModal\').classList.remove(\'open\')">Watch only</button><button class="insight-btn secondary">Review plan</button><button class="insight-btn primary" onclick="document.getElementById(\'alertModal\').classList.remove(\'open\');document.getElementById(\'callModal\').classList.add(\'open\')">Schedule call</button>',
+    footer: 'Pattern detected over 14 days · last updated 4h ago'
+  },
+  ana: {
+    name: 'Ana Beatriz Costa',
+    pillClass: 'blue',
+    pillText: '↑ Opportunity · ready to progress',
+    signals: [
+      {label:'HRV (14-day)', value:'68 ms', delta:'↑ 4% improving', deltaClass:'good'},
+      {label:'Sleep quality', value:'87%', delta:'↑ 6 pts vs baseline', deltaClass:'good'},
+      {label:'TSS adherence', value:'98%', delta:'on plan', deltaClass:'good'},
+      {label:'Resting HR', value:'49 bpm', delta:'↓ 2 bpm', deltaClass:'good'}
+    ],
+    pattern: 'All four primary markers are <strong>moving in the right direction simultaneously</strong>. Ana is fully absorbing current load and showing positive adaptation. This is the green light moment — leaving her at current volume now is leaving fitness on the table.',
+    raLabel: '⚡ Progression opportunity',
+    raText: '<strong>Increase weekly volume by <span class="signal-hit good">+10%</span> in the next block.</strong> Add a second quality session midweek. Target a moderate breakthrough workout in <span class="signal-hit good">14 days</span> to confirm the new ceiling.',
+    actions: '<button class="insight-btn secondary" onclick="document.getElementById(\'alertModal\').classList.remove(\'open\')">Hold for now</button><button class="insight-btn secondary">Plan progression</button><button class="insight-btn primary">Apply +10% volume</button>',
+    footer: 'Trend confirmed over 2 weeks · last updated 6h ago'
+  }
+};
+
+function openAlert(id){
+  const d = ALERT_DATA[id];
+  document.getElementById('alertName').textContent = d.name;
+  const pill = document.getElementById('alertPill');
+  pill.className = 'alert-pill ' + d.pillClass;
+  pill.textContent = d.pillText;
+  document.getElementById('alertSignals').innerHTML = d.signals.map(s =>
+    `<div class="signal-card">
+      <div class="signal-label">${s.label}</div>
+      <div class="signal-value">${s.value}</div>
+      <div class="signal-delta ${s.deltaClass}">${s.delta}</div>
+    </div>`
+  ).join('');
+  document.getElementById('alertPattern').innerHTML = d.pattern;
+  document.getElementById('alertRaLabel').textContent = d.raLabel;
+  document.getElementById('alertRaText').innerHTML = d.raText;
+  document.getElementById('alertActions').innerHTML = d.actions;
+  document.getElementById('alertFooterNote').textContent = d.footer;
+  document.getElementById('alertModal').classList.add('open');
+}
+</script>
+
+</body>
+</html>
