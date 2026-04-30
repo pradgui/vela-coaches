@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vela — Guilherme · 21-27 Abril</title>
+<title>Vela — Coach Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -780,26 +780,11 @@ body{
 
     <!-- SUMMARY STRIP -->
     <div class="summary-strip">
-        <div class="stat-card danger">
-          <div class="stat-label">Atenção imediata</div>
-          <div class="stat-value" style="color:var(--danger)">1</div>
-          <div class="stat-sub">atletas críticos</div>
-        </div>
-        <div class="stat-card warn">
-          <div class="stat-label">Observar</div>
-          <div class="stat-value" style="color:var(--warn)">1</div>
-          <div class="stat-sub">em monitoramento</div>
-        </div>
-        <div class="stat-card green">
-          <div class="stat-label">No plano</div>
-          <div class="stat-value" style="color:var(--teal-light)">1</div>
-          <div class="stat-sub">atletas estáveis</div>
-        </div>
-        <div class="stat-card blue">
-          <div class="stat-label">Aderência média</div>
-          <div class="stat-value" style="color:var(--blue)">89%</div>
-          <div class="stat-sub">semana 21-27 Abril</div>
-        </div></div>
+      <div class="stat-card green">
+        <div class="stat-label">On track</div>
+        <div class="stat-val">19</div>
+        <div class="stat-sub"><b class="green">68%</b> of roster performing within plan</div>
+      </div>
       <div class="stat-card warn">
         <div class="stat-label">Watch closely</div>
         <div class="stat-val">6</div>
@@ -909,15 +894,6 @@ body{
     <!-- ROSTER + ALERTS -->
     <div class="grid-2">
 
-      
-    <div class="panel" style="margin-bottom:14px;">
-      <div class="panel-header">
-        <div class="panel-title">☀️ Resumo executivo</div>
-      </div>
-      <div class="panel-body" style="padding:16px 18px;font-size:13px;color:var(--text2);line-height:1.7;">
-        Semana com atenção necessária para Ana Lima, que abandonou treinos sem comunicação e precisa de contato urgente. Mariana apresenta sinais de sobrecarga que requerem ajuste preventivo. Carlos segue como referência de consistência e boa adaptação.
-      </div>
-    </div>
       <div class="panel">
         <div class="panel-header">
           <div class="panel-title">Full roster — risk ranking</div>
@@ -935,67 +911,94 @@ body{
             <span style="text-align:right">Action</span>
           </div>
 
-          
-        <div class="roster-row">
-          <div class="risk-badge danger">!</div>
-          <div>
-            <div class="athlete-name">Ana Lima</div>
-            <div class="athlete-event">Abandonou treinos longos sem comunicar</div>
+          <div class="roster-row selected">
+            <div class="risk-badge danger">!</div>
+            <div><div class="athlete-name">Marcus Delgado</div><div class="athlete-event">70.3 Floripa · Jun 14</div></div>
+            <div class="metric-cell"><span class="metric-val" style="color:var(--danger)">48ms</span><span class="metric-delta down">↓22%</span></div>
+            <div class="metric-cell"><span class="metric-val">487</span><span class="metric-delta down">+31%</span></div>
+            <div class="metric-cell"><span class="metric-val" style="color:var(--danger)">5.8h</span><span class="metric-delta down">↓1.4h</span></div>
+            <div class="metric-cell"><span class="metric-val">3/5</span><span class="metric-delta flat">—</span></div>
+            <div class="metric-cell"><span class="tag danger">Act today</span></div>
+            <div class="metric-cell"><span style="font-size:11px;color:var(--teal-light);cursor:pointer">Adjust →</span></div>
           </div>
-          <div class="metric-cell">
-            <span class="metric-val">55%</span>
-            <span class="metric-delta down">
-              ↓
-            </span>
+
+          <div class="roster-row">
+            <div class="risk-badge danger">!</div>
+            <div><div class="athlete-name">Sofia Andrade</div><div class="athlete-event">IRONMAN Brasil · Oct 5</div></div>
+            <div class="metric-cell"><span class="metric-val" style="color:var(--danger)">51ms</span><span class="metric-delta down">↓18%</span></div>
+            <div class="metric-cell"><span class="metric-val">520</span><span class="metric-delta down">+28%</span></div>
+            <div class="metric-cell"><span class="metric-val">6.1h</span><span class="metric-delta down">↓1.1h</span></div>
+            <div class="metric-cell"><span class="metric-val">4/5</span><span class="metric-delta flat">—</span></div>
+            <div class="metric-cell"><span class="tag danger">Act today</span></div>
+            <div class="metric-cell"><span style="font-size:11px;color:var(--teal-light);cursor:pointer">Adjust →</span></div>
           </div>
-          <div class="metric-cell"><span class="metric-val">—</span></div>
-          <div class="metric-cell"><span class="metric-val">—</span></div>
-          <div class="metric-cell"><span class="metric-val">—</span></div>
-          <div class="metric-cell"><span class="tag danger">Atenção</span></div>
-          <div class="metric-cell">
-            <span style="font-size:11px;color:var(--teal-light);cursor:pointer">Ver →</span>
+
+          <div class="roster-row">
+            <div class="risk-badge danger">!</div>
+            <div><div class="athlete-name">Rafael Lima</div><div class="athlete-event">70.3 Maceió · Aug 3</div></div>
+            <div class="metric-cell"><span class="metric-val" style="color:var(--warn)">56ms</span><span class="metric-delta down">↓14%</span></div>
+            <div class="metric-cell"><span class="metric-val">445</span><span class="metric-delta down">+22%</span></div>
+            <div class="metric-cell"><span class="metric-val" style="color:var(--warn)">6.4h</span><span class="metric-delta down">↓0.8h</span></div>
+            <div class="metric-cell"><span class="metric-val">2/5</span><span class="metric-delta down">low</span></div>
+            <div class="metric-cell"><span class="tag danger">Act today</span></div>
+            <div class="metric-cell"><span style="font-size:11px;color:var(--teal-light);cursor:pointer">Adjust →</span></div>
           </div>
-        </div>
-        <div class="roster-row">
-          <div class="risk-badge warn">~</div>
-          <div>
-            <div class="athlete-name">Mariana Souza</div>
-            <div class="athlete-event">Sobrecarga com sinais de fadiga</div>
+
+          <div class="roster-row">
+            <div class="risk-badge warn">~</div>
+            <div><div class="athlete-name">Camila Torres</div><div class="athlete-event">70.3 Floripa · Jun 14</div></div>
+            <div class="metric-cell"><span class="metric-val" style="color:var(--warn)">62ms</span><span class="metric-delta down">↓9%</span></div>
+            <div class="metric-cell"><span class="metric-val">390</span><span class="metric-delta down">+12%</span></div>
+            <div class="metric-cell"><span class="metric-val">7.0h</span><span class="metric-delta flat">—</span></div>
+            <div class="metric-cell"><span class="metric-val">5/5</span><span class="metric-delta up">✓</span></div>
+            <div class="metric-cell"><span class="tag warn">Watch</span></div>
+            <div class="metric-cell"><span style="font-size:11px;color:var(--text3);cursor:pointer">Review</span></div>
           </div>
-          <div class="metric-cell">
-            <span class="metric-val">113%</span>
-            <span class="metric-delta up">
-              ✓
-            </span>
+
+          <div class="roster-row">
+            <div class="risk-badge warn">~</div>
+            <div><div class="athlete-name">Diego Mendes</div><div class="athlete-event">IRONMAN Brasil · Oct 5</div></div>
+            <div class="metric-cell"><span class="metric-val" style="color:var(--warn)">65ms</span><span class="metric-delta down">↓7%</span></div>
+            <div class="metric-cell"><span class="metric-val">360</span><span class="metric-delta down">+8%</span></div>
+            <div class="metric-cell"><span class="metric-val">7.2h</span><span class="metric-delta flat">—</span></div>
+            <div class="metric-cell"><span class="metric-val">4/5</span><span class="metric-delta flat">—</span></div>
+            <div class="metric-cell"><span class="tag warn">Watch</span></div>
+            <div class="metric-cell"><span style="font-size:11px;color:var(--text3);cursor:pointer">Review</span></div>
           </div>
-          <div class="metric-cell"><span class="metric-val">—</span></div>
-          <div class="metric-cell"><span class="metric-val">—</span></div>
-          <div class="metric-cell"><span class="metric-val">—</span></div>
-          <div class="metric-cell"><span class="tag warn">Observar</span></div>
-          <div class="metric-cell">
-            <span style="font-size:11px;color:var(--teal-light);cursor:pointer">Ver →</span>
+
+          <div class="roster-row">
+            <div class="risk-badge green">✓</div>
+            <div><div class="athlete-name">Milena Prado</div><div class="athlete-event">Olympic · build · improving</div></div>
+            <div class="metric-cell"><span class="metric-val" style="color:var(--teal-light)">71ms</span><span class="metric-delta up">+5%</span></div>
+            <div class="metric-cell"><span class="metric-val">320</span><span class="metric-delta flat">on plan</span></div>
+            <div class="metric-cell"><span class="metric-val" style="color:var(--teal-light)">7.8h</span><span class="metric-delta up">+0.4h</span></div>
+            <div class="metric-cell"><span class="metric-val">5/5</span><span class="metric-delta up">✓</span></div>
+            <div class="metric-cell"><span class="tag green">Ready ↑</span></div>
+            <div class="metric-cell"><span style="font-size:11px;color:var(--text3);cursor:pointer">View</span></div>
           </div>
-        </div>
-        <div class="roster-row">
-          <div class="risk-badge green">✓</div>
-          <div>
-            <div class="athlete-name">Carlos Mota</div>
-            <div class="athlete-event">Execução exemplar e adaptação positiva</div>
+
+          <div class="roster-row">
+            <div class="risk-badge green">✓</div>
+            <div><div class="athlete-name">Iara Saraiva</div><div class="athlete-event">70.3 · base · improving</div></div>
+            <div class="metric-cell"><span class="metric-val" style="color:var(--teal-light)">68ms</span><span class="metric-delta up">+4%</span></div>
+            <div class="metric-cell"><span class="metric-val">305</span><span class="metric-delta flat">on plan</span></div>
+            <div class="metric-cell"><span class="metric-val" style="color:var(--teal-light)">7.6h</span><span class="metric-delta up">+0.3h</span></div>
+            <div class="metric-cell"><span class="metric-val">5/5</span><span class="metric-delta up">✓</span></div>
+            <div class="metric-cell"><span class="tag green">Ready ↑</span></div>
+            <div class="metric-cell"><span style="font-size:11px;color:var(--text3);cursor:pointer">View</span></div>
           </div>
-          <div class="metric-cell">
-            <span class="metric-val">99%</span>
-            <span class="metric-delta up">
-              ✓
-            </span>
+
+          <div class="roster-row">
+            <div class="risk-badge green">✓</div>
+            <div><div class="athlete-name">Pedro Santana</div><div class="athlete-event">IRONMAN AZ · Nov 17</div></div>
+            <div class="metric-cell"><span class="metric-val" style="color:var(--teal-light)">82ms</span><span class="metric-delta up">+6%</span></div>
+            <div class="metric-cell"><span class="metric-val">290</span><span class="metric-delta flat">on plan</span></div>
+            <div class="metric-cell"><span class="metric-val">8.1h</span><span class="metric-delta up">+0.6h</span></div>
+            <div class="metric-cell"><span class="metric-val">5/5</span><span class="metric-delta up">✓</span></div>
+            <div class="metric-cell"><span class="tag green">On track</span></div>
+            <div class="metric-cell"><span style="font-size:11px;color:var(--text3);cursor:pointer">View</span></div>
           </div>
-          <div class="metric-cell"><span class="metric-val">—</span></div>
-          <div class="metric-cell"><span class="metric-val">—</span></div>
-          <div class="metric-cell"><span class="metric-val">—</span></div>
-          <div class="metric-cell"><span class="tag green">OK</span></div>
-          <div class="metric-cell">
-            <span style="font-size:11px;color:var(--teal-light);cursor:pointer">Ver →</span>
-          </div>
-        </div>
+
           <div style="padding:10px 18px;font-size:11px;color:var(--text3);border-top:1px solid var(--border);font-weight:400">
             + 21 more athletes · <span style="color:var(--teal-light);cursor:pointer">19 on track · 3 watch · 0 critical</span>
           </div>
@@ -1010,25 +1013,43 @@ body{
             <div class="panel-action">Mark all read</div>
           </div>
           <div class="panel-body">
-            
-        <div class="alert-item">
-          <div class="alert-icon danger">⚠</div>
-          <div style="flex:1">
-            <div class="alert-name">Ana Lima</div>
-            <div class="alert-text">Aderência muito baixa com apenas 55% do TSS planejado. Pulou os dois longões do fim de semana sem aviso prévio, o que indica possível problema de motivação, lesão ou questões pessoais. Qualidade de sono ruim pode estar afetando disposição.</div>
-            <div class="alert-action">→ Agendar conversa individual urgente para entender o que está acontecendo e recalibrar expectativas</div>
+            <div class="alert-item" onclick="openAlert('marcus')">
+              <div class="alert-icon danger">⚠</div>
+              <div style="flex:1">
+                <div class="alert-name">Marcus Delgado</div>
+                <div class="alert-text">HRV down 22% over 9 days. TSS exceeded plan by 31%. Sleep deficit detected. Convergent fatigue signals.</div>
+                <div class="alert-action">→ Apply full rest protocol</div>
+              </div>
+              <div class="alert-time">now</div>
+            </div>
+            <div class="alert-item" onclick="openAlert('sofia')">
+              <div class="alert-icon danger">⚠</div>
+              <div style="flex:1">
+                <div class="alert-name">Sofia Andrade</div>
+                <div class="alert-text">Resting HR elevated 11 bpm above 30-day baseline. TSS 28% above plan. Reduce load immediately.</div>
+                <div class="alert-action">→ Suggest recovery week</div>
+              </div>
+              <div class="alert-time">2h</div>
+            </div>
+            <div class="alert-item" onclick="openAlert('camila')">
+              <div class="alert-icon warn">↗</div>
+              <div style="flex:1">
+                <div class="alert-name">Camila Torres</div>
+                <div class="alert-text">Load 12% above plan for 2nd consecutive week. HRV stable but trending down. Watch closely.</div>
+                <div class="alert-action">→ Review this week's plan</div>
+              </div>
+              <div class="alert-time">4h</div>
+            </div>
+            <div class="alert-item" onclick="openAlert('ana')">
+              <div class="alert-icon blue">↑</div>
+              <div style="flex:1">
+                <div class="alert-name">Ana Beatriz Costa</div>
+                <div class="alert-text">HRV up 4% over 2 weeks. Sleep quality improving. Ready for load progression next block.</div>
+                <div class="alert-action">→ Increase volume 10%</div>
+              </div>
+              <div class="alert-time">6h</div>
+            </div>
           </div>
-          <div class="alert-time">now</div>
-        </div>
-        <div class="alert-item">
-          <div class="alert-icon warn">↗</div>
-          <div style="flex:1">
-            <div class="alert-name">Mariana Souza</div>
-            <div class="alert-text">Treinou 13% acima do planejado, o que normalmente seria positivo, mas FC de repouso está subindo (58 bpm). Sono regular combinado com excesso de carga indica risco de overtraining. Corpo está sinalizando necessidade de recuperação.</div>
-            <div class="alert-action">→ Orientar redução de volume na próxima semana e monitorar FC de repouso diariamente</div>
-          </div>
-          <div class="alert-time">now</div>
-        </div></div>
         </div>
 
         <div class="panel">
@@ -1700,6 +1721,5 @@ function openAlert(id){
 }
 </script>
 
-<script>const VELA_DATA = <!-- VELA_JSON -->;</script>
 </body>
 </html>
